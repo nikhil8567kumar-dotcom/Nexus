@@ -1,0 +1,4019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#07060d" />
+  <title>NEXUS — Your Personal Intelligence System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #06060c;
+      --bg-secondary: #0d0a1a;
+      --bg-card: rgba(18, 14, 34, 0.72);
+      --bg-card-hover: rgba(26, 20, 48, 0.85);
+      --bg-input: rgba(12, 10, 24, 0.85);
+      --border-subtle: rgba(139, 92, 246, 0.2);
+      --border-glow: rgba(139, 92, 246, 0.48);
+      --accent-purple: #8b5cf6;
+      --accent-violet: #a855f7;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-primary: #f3f4f6;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --nav-height: 64px;
+      --header-height: 58px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-glow: 0 8px 32px rgba(139, 92, 246, 0.16);
+      --transition: 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    body[data-theme="cyber-blue"] {
+      --bg-primary: #050811;
+      --bg-secondary: #081226;
+      --bg-card: rgba(12, 22, 44, 0.74);
+      --bg-card-hover: rgba(18, 32, 62, 0.86);
+      --border-subtle: rgba(59, 130, 246, 0.24);
+      --border-glow: rgba(6, 182, 212, 0.5);
+      --accent-purple: #3b82f6;
+      --accent-violet: #06b6d4;
+      --shadow-glow: 0 8px 32px rgba(59, 130, 246, 0.18);
+    }
+
+    body[data-theme="obsidian"] {
+      --bg-primary: #050507;
+      --bg-secondary: #0d0d12;
+      --bg-card: rgba(20, 20, 28, 0.76);
+      --bg-card-hover: rgba(30, 30, 42, 0.88);
+      --border-subtle: rgba(161, 161, 170, 0.18);
+      --border-glow: rgba(139, 92, 246, 0.45);
+      --shadow-glow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(139, 92, 246, 0.14), transparent 42%),
+        radial-gradient(circle at 85% 25%, rgba(59, 130, 246, 0.12), transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.09), transparent 45%);
+      background-attachment: fixed;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    /* App Shell */
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      max-width: 960px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Top Header */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: var(--header-height);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(6, 6, 12, 0.8);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 16px rgba(139, 92, 246, 0.45);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      color: #fff;
+    }
+
+    .brand-text h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      line-height: 1.1;
+    }
+
+    .brand-text span {
+      display: block;
+      font-size: 10px;
+      color: var(--text-secondary);
+      letter-spacing: 0.03em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .status-pill:hover {
+      border-color: var(--border-glow);
+      color: var(--text-primary);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-amber);
+      box-shadow: 0 0 8px var(--accent-amber);
+    }
+
+    .status-dot.online {
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+    }
+
+    .status-dot.offline {
+      background: var(--accent-rose);
+      box-shadow: 0 0 8px var(--accent-rose);
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-primary);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .icon-btn:hover, .icon-btn.active {
+      border-color: var(--border-glow);
+      background: rgba(139, 92, 246, 0.16);
+      color: #fff;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      padding: 16px 16px calc(var(--nav-height) + 24px + env(safe-area-inset-bottom));
+    }
+
+    .view-section {
+      display: none;
+      animation: fadeSlideUp 0.25s ease forwards;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Glass Cards */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-glow);
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .card + .card {
+      margin-top: 14px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(139, 92, 246, 0.18);
+      color: #ddd6fe;
+      border: 1px solid rgba(139, 92, 246, 0.32);
+    }
+
+    .badge.blue {
+      background: rgba(59, 130, 246, 0.16);
+      color: #bfdbfe;
+      border-color: rgba(59, 130, 246, 0.34);
+    }
+
+    .badge.green {
+      background: rgba(16, 185, 129, 0.16);
+      color: #a7f3d0;
+      border-color: rgba(16, 185, 129, 0.32);
+    }
+
+    .badge.amber {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fde68a;
+      border-color: rgba(245, 158, 11, 0.32);
+    }
+
+    .badge.rose {
+      background: rgba(244, 63, 94, 0.16);
+      color: #fecdd3;
+      border-color: rgba(244, 63, 94, 0.32);
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 9px 15px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: var(--border-glow);
+      background: rgba(139, 92, 246, 0.18);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      filter: brightness(1.08);
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+    }
+
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: rgba(244, 63, 94, 0.26);
+      border-color: rgba(244, 63, 94, 0.6);
+    }
+
+    .btn-sm {
+      min-height: 32px;
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: var(--radius-sm);
+    }
+
+    .field-group {
+      margin-bottom: 12px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .input, .select, .textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .input:focus, .select:focus, .textarea:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+    }
+
+    .textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    /* Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (min-width: 680px) {
+      .grid-md-2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+    }
+
+    /* Dashboard Hero */
+    .hero-card {
+      background: linear-gradient(145deg, rgba(24, 16, 48, 0.86), rgba(10, 14, 32, 0.86));
+      border: 1px solid var(--border-glow);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .hero-greeting h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #ffffff, #c4b5fd, #93c5fd);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-datetime {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* FRIDAY Animated CSS Orb */
+    .orb-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .friday-orb {
+      position: relative;
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+    }
+
+    .friday-orb.lg {
+      width: 112px;
+      height: 112px;
+    }
+
+    .orb-core {
+      width: 68%;
+      height: 68%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 32%, #e0e7ff, #8b5cf6 45%, #3b82f6 78%, #1e1b4b 100%);
+      box-shadow:
+        0 0 24px rgba(139, 92, 246, 0.7),
+        0 0 48px rgba(59, 130, 246, 0.4),
+        inset 0 0 14px rgba(255, 255, 255, 0.45);
+      animation: orbBreathe 3.4s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .orb-ring {
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(139, 92, 246, 0.45);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .orb-ring.r2 {
+      inset: -4px;
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+
+    .orb-wave {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .orb-wave span {
+      width: 3px;
+      height: 10px;
+      border-radius: 3px;
+      background: #ffffff;
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Orb State: Idle */
+    .friday-orb[data-state="idle"] .orb-ring {
+      animation: orbRingIdle 4s ease-in-out infinite;
+    }
+
+    /* Orb State: Listening */
+    .friday-orb[data-state="listening"] .orb-core {
+      background: radial-gradient(circle at 35% 35%, #ccfbf1, #06b6d4 48%, #3b82f6 85%);
+      box-shadow: 0 0 32px rgba(6, 182, 212, 0.85), 0 0 60px rgba(59, 130, 246, 0.5);
+      transform: scale(1.06);
+    }
+
+    .friday-orb[data-state="listening"] .orb-ring {
+      border-color: rgba(6, 182, 212, 0.85);
+      animation: orbPulseRing 1.2s ease-out infinite;
+    }
+
+    .friday-orb[data-state="listening"] .orb-ring.r2 {
+      animation: orbPulseRing 1.2s ease-out 0.6s infinite;
+    }
+
+    /* Orb State: Thinking */
+    .friday-orb[data-state="thinking"] .orb-core {
+      animation: orbThinkPulse 1.1s ease-in-out infinite;
+    }
+
+    .friday-orb[data-state="thinking"] .orb-ring {
+      border: 2px dashed rgba(168, 85, 247, 0.9);
+      animation: orbSpin 1.4s linear infinite;
+    }
+
+    .friday-orb[data-state="thinking"] .orb-ring.r2 {
+      border: 2px dotted rgba(6, 182, 212, 0.85);
+      animation: orbSpinReverse 2s linear infinite;
+    }
+
+    /* Orb State: Speaking */
+    .friday-orb[data-state="speaking"] .orb-core {
+      box-shadow: 0 0 34px rgba(168, 85, 247, 0.9), 0 0 64px rgba(59, 130, 246, 0.55);
+    }
+
+    .friday-orb[data-state="speaking"] .orb-wave {
+      display: flex;
+    }
+
+    .friday-orb[data-state="speaking"] .orb-wave span:nth-child(1) { animation: waveBar 0.55s ease-in-out infinite alternate; }
+    .friday-orb[data-state="speaking"] .orb-wave span:nth-child(2) { animation: waveBar 0.45s ease-in-out 0.12s infinite alternate; }
+    .friday-orb[data-state="speaking"] .orb-wave span:nth-child(3) { animation: waveBar 0.6s ease-in-out 0.24s infinite alternate; }
+    .friday-orb[data-state="speaking"] .orb-wave span:nth-child(4) { animation: waveBar 0.48s ease-in-out 0.16s infinite alternate; }
+    .friday-orb[data-state="speaking"] .orb-wave span:nth-child(5) { animation: waveBar 0.58s ease-in-out 0.06s infinite alternate; }
+
+    .orb-state-label {
+      margin-top: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    @keyframes orbBreathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes orbRingIdle {
+      0%, 100% { transform: scale(1); opacity: 0.45; }
+      50% { transform: scale(1.06); opacity: 0.8; }
+    }
+
+    @keyframes orbPulseRing {
+      0% { transform: scale(0.9); opacity: 0.9; }
+      100% { transform: scale(1.42); opacity: 0; }
+    }
+
+    @keyframes orbSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes orbSpinReverse {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+
+    @keyframes orbThinkPulse {
+      0%, 100% { transform: scale(0.95); filter: brightness(1); }
+      50% { transform: scale(1.07); filter: brightness(1.25); }
+    }
+
+    @keyframes waveBar {
+      from { height: 6px; opacity: 0.65; }
+      to { height: 24px; opacity: 1; }
+    }
+
+    /* Quick Access Module Tiles */
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (min-width: 600px) {
+      .module-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .module-tile {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      text-align: left;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .module-tile:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+
+    .module-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(139, 92, 246, 0.16);
+      color: #c4b5fd;
+    }
+
+    .module-tile h3 {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .module-tile p {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.35;
+    }
+
+    /* Stat Boxes */
+    .stat-box {
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Quick Actions Row */
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Activity List */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+
+    .activity-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* FRIDAY Chat Interface */
+    .friday-shell {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .friday-orb-stage {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+    }
+
+    .friday-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      height: min(56dvh, 520px);
+      min-height: 320px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 88%;
+    }
+
+    .msg-row.user {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .msg-row.assistant {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .msg-bubble {
+      padding: 11px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .msg-row.user .msg-bubble {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-row.assistant .msg-bubble {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-row.error .msg-bubble {
+      background: rgba(244, 63, 94, 0.14);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: #fecdd3;
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .msg-action-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 2px 5px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: var(--transition);
+    }
+
+    .msg-action-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .typing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      align-self: flex-start;
+    }
+
+    .typing-indicator span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-purple);
+      animation: typingBounce 1.2s infinite ease-in-out;
+    }
+
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: scale(0.65); opacity: 0.45; }
+      40% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .chat-composer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 10px 12px;
+      background: rgba(8, 7, 16, 0.85);
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .chat-composer textarea {
+      flex: 1;
+      min-height: 42px;
+      max-height: 120px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+    }
+
+    .chat-composer textarea:focus {
+      border-color: var(--accent-purple);
+    }
+
+    /* Progress Bar */
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+      transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Segmented Tabs */
+    .segmented {
+      display: inline-flex;
+      padding: 4px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      gap: 4px;
+      width: 100%;
+    }
+
+    .segmented button {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .segmented button.active {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(59, 130, 246, 0.35));
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(139, 92, 246, 0.25);
+    }
+
+    /* Quest & Note Items */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .list-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      transition: var(--transition);
+    }
+
+    .list-row:hover {
+      border-color: var(--border-subtle);
+    }
+
+    .list-row.completed {
+      opacity: 0.65;
+    }
+
+    /* Timer Display */
+    .timer-display {
+      font-size: 46px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-align: center;
+      padding: 14px 0;
+      background: linear-gradient(135deg, #fff, #c4b5fd);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* Alert Banner */
+    .notice-banner {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      background: rgba(245, 158, 11, 0.1);
+      color: #fde68a;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .notice-banner.info {
+      border-color: rgba(59, 130, 246, 0.35);
+      background: rgba(59, 130, 246, 0.1);
+      color: #bfdbfe;
+    }
+
+    .notice-banner.error {
+      border-color: rgba(244, 63, 94, 0.4);
+      background: rgba(244, 63, 94, 0.12);
+      color: #fecdd3;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .empty-state strong {
+      display: block;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      height: calc(var(--nav-height) + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
+      background: rgba(7, 6, 14, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: center;
+    }
+
+    .bottom-nav-inner {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      transition: color var(--transition);
+      padding: 6px 2px;
+    }
+
+    .nav-tab svg {
+      width: 20px;
+      height: 20px;
+      transition: transform var(--transition);
+    }
+
+    .nav-tab.active {
+      color: #e9d5ff;
+    }
+
+    .nav-tab.active svg {
+      transform: translateY(-1px);
+      color: var(--accent-purple);
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.7));
+    }
+
+    .nav-tab.active::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 28px;
+      height: 2.5px;
+      border-radius: 0 0 4px 4px;
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+    }
+
+    /* Modal & Toast */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(2, 2, 6, 0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 420px;
+      background: #120e24;
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-card h3 {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .modal-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .toast-container {
+      position: fixed;
+      top: calc(var(--header-height) + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 110;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: min(92vw, 380px);
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(18, 14, 34, 0.96);
+      border: 1px solid var(--border-glow);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      animation: fadeSlideUp 0.2s ease;
+    }
+
+    .toast.error {
+      border-color: rgba(244, 63, 94, 0.6);
+      background: rgba(40, 12, 20, 0.96);
+    }
+
+    .toast.success {
+      border-color: rgba(16, 185, 129, 0.6);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .row-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .row-gap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .studio-output {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.6;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body data-theme="midnight-purple">
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="brand-lockup">
+        <div class="brand-mark">NX</div>
+        <div class="brand-text">
+          <h1>NEXUS</h1>
+          <span>Your Personal Intelligence System</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="headerApiStatusBtn" class="status-pill" type="button" title="API Status">
+          <span id="headerApiDot" class="status-dot"></span>
+          <span id="headerApiLabel">API: Unset</span>
+        </button>
+        <button id="openSettingsBtn" class="icon-btn" type="button" aria-label="Open Settings" title="Settings">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Views -->
+    <main class="main-content">
+      <!-- 1. DASHBOARD -->
+      <section id="view-dashboard" class="view-section active">
+        <div class="card hero-card">
+          <div class="hero-top">
+            <div class="hero-greeting">
+              <h2 id="dashGreeting">Good Morning, Operator</h2>
+              <div class="hero-datetime">
+                <span id="dashDate">—</span>
+                <span>•</span>
+                <span id="dashTime" class="mono">—</span>
+              </div>
+              <p id="dashTagline" style="font-size:12px; color:var(--text-secondary); margin-top:8px;">
+                All local subsystems online. Tap the orb to talk with FRIDAY.
+              </p>
+            </div>
+            <div class="orb-wrapper" id="dashOrbTrigger" role="button" tabindex="0" aria-label="Open FRIDAY AI">
+              <div class="friday-orb" id="dashOrb" data-state="idle">
+                <div class="orb-ring"></div>
+                <div class="orb-ring r2"></div>
+                <div class="orb-core"></div>
+                <div class="orb-wave"><span></span><span></span><span></span><span></span><span></span></div>
+              </div>
+              <span class="orb-state-label" id="dashOrbLabel">FRIDAY • IDLE</span>
+            </div>
+          </div>
+
+          <div class="quick-actions">
+            <button class="btn btn-primary btn-sm" type="button" data-nav="friday">Ask FRIDAY</button>
+            <button class="btn btn-sm" type="button" id="qaStartFocusBtn">Start 25m Focus</button>
+            <button class="btn btn-sm" type="button" id="qaNewNoteBtn">New Note</button>
+            <button class="btn btn-sm" type="button" data-nav="studio">Creative Studio</button>
+          </div>
+        </div>
+
+        <!-- Daily Productivity Summary -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Daily Productivity Summary</span>
+            <span class="badge" id="dashRpgBadge">LVL 1 • 0 EXP</span>
+          </div>
+          <div class="grid-2">
+            <div class="stat-box">
+              <div class="stat-value" id="statFocusToday">0m</div>
+              <div class="stat-label">Measured Focus Today</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="statQuestsToday">0/0</div>
+              <div class="stat-label">Daily Quests Done</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="statNotesCount">0</div>
+              <div class="stat-label">Second Brain Notes</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="statAiQueries">0</div>
+              <div class="stat-label">FRIDAY Queries Today</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick-Access Modules -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Quick-Access Modules</span>
+            <span class="badge blue">5 Modules</span>
+          </div>
+          <div class="module-grid">
+            <button class="module-tile" type="button" data-nav="friday">
+              <div class="module-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2 2"/></svg>
+              </div>
+              <h3>FRIDAY AI</h3>
+              <p>Voice &amp; Gemini chat assistant with Hinglish support.</p>
+            </button>
+            <button class="module-tile" type="button" data-nav="rpg">
+              <div class="module-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <h3>LIFE RPG</h3>
+              <p>Hunter level, EXP progression, daily quests &amp; badges.</p>
+            </button>
+            <button class="module-tile" type="button" data-nav="brain">
+              <div class="module-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <h3>SECOND BRAIN</h3>
+              <p>Local knowledge vault with instant search &amp; editing.</p>
+            </button>
+            <button class="module-tile" type="button" data-nav="studio">
+              <div class="module-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+              </div>
+              <h3>CREATIVE STUDIO</h3>
+              <p>Story &amp; Reel script generator powered by Gemini.</p>
+            </button>
+            <button class="module-tile" type="button" data-nav="phone">
+              <div class="module-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              </div>
+              <h3>PHONE INTELLIGENCE</h3>
+              <p>Focus timer, measured sessions &amp; manual activity logs.</p>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-md-2" style="margin-top: 14px;">
+          <!-- System Status -->
+          <div class="card" style="margin-top: 0;">
+            <div class="card-header">
+              <span class="card-title">System Status</span>
+              <button class="btn btn-sm" type="button" data-nav="settings">Configure</button>
+            </div>
+            <div class="item-list" id="dashSystemStatus"></div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="card" style="margin-top: 0;">
+            <div class="card-header">
+              <span class="card-title">Recent Activity</span>
+              <span class="badge blue" id="activityCountBadge">0 events</span>
+            </div>
+            <div id="dashRecentActivity" class="activity-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. FRIDAY AI -->
+      <section id="view-friday" class="view-section">
+        <div class="friday-shell">
+          <div class="card friday-orb-stage">
+            <div class="row-gap" style="flex:1;">
+              <div class="friday-orb" id="fridayOrb" data-state="idle">
+                <div class="orb-ring"></div>
+                <div class="orb-ring r2"></div>
+                <div class="orb-core"></div>
+                <div class="orb-wave"><span></span><span></span><span></span><span></span><span></span></div>
+              </div>
+              <div>
+                <div style="font-size:16px; font-weight:700;">FRIDAY AI</div>
+                <div id="fridayOrbStatusText" style="font-size:12px; color:var(--text-secondary);">Idle • Ready</div>
+                <div class="friday-controls">
+                  <select id="fridayPersonalitySelect" class="select" style="width:auto; padding:5px 8px; font-size:12px;" aria-label="AI Personality">
+                    <option value="tactical">Tactical &amp; Concise</option>
+                    <option value="companion">Friendly Companion</option>
+                    <option value="mentor">Mentor &amp; Strategist</option>
+                    <option value="creative">Creative Partner</option>
+                  </select>
+                  <button id="fridayLangToggle" class="btn btn-sm" type="button">Lang: EN</button>
+                  <button id="fridayVoiceToggle" class="btn btn-sm" type="button">Voice: Off</button>
+                  <button id="fridayStopSpeakBtn" class="btn btn-sm btn-danger hidden" type="button">Stop Audio</button>
+                </div>
+              </div>
+            </div>
+            <button id="clearChatBtn" class="btn btn-danger btn-sm" type="button">Clear</button>
+          </div>
+
+          <div id="fridayApiBanner" class="notice-banner hidden">
+            <span id="fridayApiBannerText">AI provider is not configured. Configure your API key in Settings to chat with FRIDAY.</span>
+            <button class="btn btn-primary btn-sm" type="button" data-nav="settings">Configure API</button>
+          </div>
+
+          <div id="voiceStatusBanner" class="notice-banner info hidden">
+            <span id="voiceStatusMsg">Listening...</span>
+            <button id="stopVoiceInputBtn" class="btn btn-sm" type="button">Stop Mic</button>
+          </div>
+
+          <div class="card chat-box">
+            <div id="chatMessages" class="chat-messages"></div>
+            <div id="typingRow" class="hidden" style="padding: 0 16px 10px;">
+              <div class="typing-indicator"><span></span><span></span><span></span></div>
+            </div>
+            <form id="chatForm" class="chat-composer">
+              <button id="voiceInputBtn" class="icon-btn" type="button" title="Voice Input" aria-label="Voice Input">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              </button>
+              <textarea id="chatInput" rows="1" placeholder="Message FRIDAY... (Enter to send)"></textarea>
+              <button id="sendChatBtn" class="btn btn-primary" type="submit">Send</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. LIFE RPG -->
+      <section id="view-rpg" class="view-section">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Hunter Status</span>
+            <span class="badge" id="rpgRankBadge">E-Rank Hunter</span>
+          </div>
+          <div class="row-between" style="margin-bottom: 10px;">
+            <div>
+              <div style="font-size: 26px; font-weight: 700;" id="rpgLevelDisplay">Level 1</div>
+              <div style="font-size: 12px; color: var(--text-secondary);" id="rpgExpText">0 / 100 EXP to next level</div>
+            </div>
+            <div class="stat-box" style="text-align:right; min-width:110px;">
+              <div class="stat-value mono" id="rpgTotalExp">0</div>
+              <div class="stat-label">Total EXP</div>
+            </div>
+          </div>
+          <div class="progress-track">
+            <div id="rpgExpBar" class="progress-fill" style="width: 0%;"></div>
+          </div>
+          <div class="grid-3" style="margin-top: 14px;">
+            <div class="stat-box">
+              <div class="stat-value" id="rpgQuestsCompleted">0</div>
+              <div class="stat-label">Quests Done</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="rpgAchievementsUnlocked">0/6</div>
+              <div class="stat-label">Achievements</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="rpgFocusCount">0</div>
+              <div class="stat-label">Focus Cleared</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Daily Quests</span>
+            <span class="badge green" id="rpgQuestDateBadge">Today</span>
+          </div>
+          <form id="addQuestForm" class="row-gap" style="margin-bottom: 12px;">
+            <input id="newQuestInput" class="input" style="flex:1; min-width:180px;" type="text" placeholder="Add a custom daily quest (+25 EXP)..." maxlength="80" />
+            <button class="btn btn-primary btn-sm" type="submit">Add Quest</button>
+          </form>
+          <div id="rpgQuestList" class="item-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Achievements</span>
+            <span class="badge blue">Milestone Tracker</span>
+          </div>
+          <div id="rpgAchievementList" class="item-list"></div>
+        </div>
+      </section>
+
+      <!-- 4. SECOND BRAIN -->
+      <section id="view-brain" class="view-section">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title" id="noteFormTitle">Create Note</span>
+            <button id="cancelEditNoteBtn" class="btn btn-sm hidden" type="button">Cancel Edit</button>
+          </div>
+          <form id="noteForm">
+            <input type="hidden" id="editingNoteId" value="" />
+            <div class="grid-2">
+              <div class="field-group">
+                <label class="field-label" for="noteTitleInput">Title</label>
+                <input id="noteTitleInput" class="input" type="text" placeholder="e.g. App Architecture Idea" required maxlength="100" />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="noteTagSelect">Category</label>
+                <select id="noteTagSelect" class="select">
+                  <option value="Idea">Idea</option>
+                  <option value="Task">Task</option>
+                  <option value="Learning">Learning</option>
+                  <option value="Personal">Personal</option>
+                  <option value="Script">Script</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="noteBodyInput">Content</label>
+              <textarea id="noteBodyInput" class="textarea" placeholder="Write your note, insight, or reference..." required></textarea>
+            </div>
+            <button id="saveNoteBtn" class="btn btn-primary" type="submit">Save Note</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Saved Notes</span>
+            <span class="badge" id="notesTotalBadge">0 notes</span>
+          </div>
+          <div class="row-gap" style="margin-bottom: 12px;">
+            <input id="noteSearchInput" class="input" style="flex:1;" type="search" placeholder="Search notes by title, content, or tag..." />
+            <select id="noteFilterTag" class="select" style="width:auto;" aria-label="Filter by tag">
+              <option value="ALL">All Tags</option>
+              <option value="Idea">Idea</option>
+              <option value="Task">Task</option>
+              <option value="Learning">Learning</option>
+              <option value="Personal">Personal</option>
+              <option value="Script">Script</option>
+            </select>
+          </div>
+          <div id="notesList" class="item-list"></div>
+        </div>
+      </section>
+
+      <!-- 5. CREATIVE STUDIO -->
+      <section id="view-studio" class="view-section">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Creative Studio</span>
+            <span class="badge" id="studioProviderBadge">AI Powered</span>
+          </div>
+          <div id="studioApiBanner" class="notice-banner hidden" style="margin-bottom:12px;">
+            <span id="studioApiBannerText">Configure your AI provider API key in Settings to generate stories and reel scripts.</span>
+            <button class="btn btn-primary btn-sm" type="button" data-nav="settings">Open Settings</button>
+          </div>
+          <div class="segmented" style="margin-bottom: 14px;">
+            <button type="button" class="active" data-studio-type="story">Story Generator</button>
+            <button type="button" data-studio-type="reel">Reel Script Generator</button>
+          </div>
+          <form id="studioForm">
+            <div class="grid-2">
+              <div class="field-group">
+                <label class="field-label" for="studioToneSelect">Tone / Style</label>
+                <select id="studioToneSelect" class="select">
+                  <option value="cinematic">Cinematic &amp; Atmospheric</option>
+                  <option value="energetic">High-Energy &amp; Punchy</option>
+                  <option value="emotional">Emotional &amp; Relatable</option>
+                  <option value="educational">Crisp &amp; Educational</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="studioLengthSelect">Length</label>
+                <select id="studioLengthSelect" class="select">
+                  <option value="short">Short (30s Reel / Flash Story)</option>
+                  <option value="medium" selected>Medium (60s Reel / Standard)</option>
+                  <option value="detailed">Detailed (90s+ / Deep Scene)</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="studioPromptInput">Prompt</label>
+              <textarea id="studioPromptInput" class="textarea" placeholder="Describe your story premise or reel topic..."></textarea>
+            </div>
+            <div class="row-gap">
+              <button id="studioGenerateBtn" class="btn btn-primary" type="submit">Generate Story</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="studioResultCard" class="card hidden">
+          <div class="card-header">
+            <span class="card-title" id="studioOutputTitle">Generated Output</span>
+            <div class="row-gap">
+              <button id="studioCopyBtn" class="btn btn-sm" type="button">Copy</button>
+              <button id="studioSaveNoteBtn" class="btn btn-sm btn-primary" type="button">Save to Brain</button>
+            </div>
+          </div>
+          <div id="studioOutputBody" class="studio-output"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Generations</span>
+            <span class="badge blue" id="studioHistoryCount">0 saved</span>
+          </div>
+          <div id="studioHistoryList" class="item-list"></div>
+        </div>
+      </section>
+
+      <!-- 6. PHONE INTELLIGENCE -->
+      <section id="view-phone" class="view-section">
+        <div class="notice-banner info" style="margin-bottom: 14px;">
+          <div>
+            <strong>Data Transparency:</strong> Mobile web browsers cannot monitor other Android apps or system screen time without native Android permissions. NEXUS separates <strong>Browser-Measured Focus Sessions</strong> from <strong>Manually Logged Activities</strong>.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Productivity Dashboard</span>
+            <span class="badge green" id="phoneProductivityBadge">Score: —</span>
+          </div>
+          <div class="grid-3">
+            <div class="stat-box">
+              <div class="stat-value" id="phoneMeasuredFocus">0m</div>
+              <div class="stat-label">Measured Focus</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="phoneManualProductive">0m</div>
+              <div class="stat-label">Manual Productive</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="phoneManualDistracting">0m</div>
+              <div class="stat-label">Manual Distracting</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Focus Timer -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Focus Timer</span>
+            <span class="badge">Measured Data</span>
+          </div>
+          <div class="row-gap" style="justify-content:center; margin-bottom:6px;">
+            <button class="btn btn-sm timer-preset" type="button" data-minutes="15">15m</button>
+            <button class="btn btn-sm timer-preset" type="button" data-minutes="25">25m</button>
+            <button class="btn btn-sm timer-preset" type="button" data-minutes="45">45m</button>
+          </div>
+          <div id="focusTimerDisplay" class="timer-display mono">25:00</div>
+          <div class="row-gap" style="justify-content:center;">
+            <button id="focusStartBtn" class="btn btn-primary" type="button">Start</button>
+            <button id="focusPauseBtn" class="btn" type="button" disabled>Pause</button>
+            <button id="focusResetBtn" class="btn" type="button">Reset</button>
+            <button id="focusFinishBtn" class="btn btn-sm" type="button" disabled>Log Elapsed</button>
+          </div>
+        </div>
+
+        <!-- Manual Activity Logger -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Manual Activity Log</span>
+            <span class="badge amber">Manual Entry</span>
+          </div>
+          <form id="manualLogForm">
+            <div class="grid-3">
+              <div class="field-group">
+                <label class="field-label" for="logAppInput">App / Activity</label>
+                <input id="logAppInput" class="input" type="text" placeholder="e.g. Instagram, Reading" required maxlength="50" />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="logCategorySelect">Category</label>
+                <select id="logCategorySelect" class="select">
+                  <option value="productive">Productive</option>
+                  <option value="neutral">Neutral</option>
+                  <option value="distracting">Distracting</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="logMinutesInput">Minutes</label>
+                <input id="logMinutesInput" class="input" type="number" min="1" max="720" value="20" required />
+              </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Log Activity</button>
+          </form>
+          <div id="phoneLogList" class="item-list" style="margin-top: 14px;"></div>
+        </div>
+      </section>
+
+      <!-- 7. SETTINGS -->
+      <section id="view-settings" class="view-section">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">AI Provider &amp; API Configuration</span>
+            <span class="badge" id="settingsApiBadge">Unset</span>
+          </div>
+          <p id="apiProviderHint" style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
+            Select your active AI provider below. Each provider stores its own API key, model, and connection status locally in <span class="mono">localStorage</span>. NEXUS never switches providers automatically.
+          </p>
+          <div class="grid-2" style="margin-bottom:14px;">
+            <div class="field-group" style="margin-bottom:0;">
+              <label class="field-label" for="apiProviderSelect">Active AI Provider</label>
+              <select id="apiProviderSelect" class="select">
+                <option value="groq">Groq</option>
+                <option value="openrouter">OpenRouter</option>
+                <option value="gemini">Gemini</option>
+              </select>
+            </div>
+            <div class="field-group" style="margin-bottom:0;">
+              <label class="field-label" for="apiTempInput">Temperature (<span id="apiTempVal">0.7</span>)</label>
+              <input id="apiTempInput" type="range" min="0" max="1.5" step="0.1" value="0.7" style="width:100%; margin-top:10px;" />
+            </div>
+          </div>
+          <div id="providerCardsContainer" class="item-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Personalization &amp; Voice</span>
+          </div>
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label" for="userNameInput">Operator Name</label>
+              <input id="userNameInput" class="input" type="text" placeholder="Operator" maxlength="32" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="themeSelect">Theme</label>
+              <select id="themeSelect" class="select">
+                <option value="midnight-purple">Midnight Purple</option>
+                <option value="cyber-blue">Cyber Blue</option>
+                <option value="obsidian">Obsidian Dark</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="languageSelect">FRIDAY Language</label>
+              <select id="languageSelect" class="select">
+                <option value="en">English</option>
+                <option value="hinglish">Hinglish (Natural Mix)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="voiceSelect">Speech Output Voice</label>
+              <select id="voiceSelect" class="select"></select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label" for="voiceRateInput">Speech Speed (<span id="voiceRateVal">1.0</span>x)</label>
+              <input id="voiceRateInput" type="range" min="0.7" max="1.5" step="0.1" value="1.0" style="width:100%; margin-top:8px;" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="voiceVolumeInput">Speech Volume (<span id="voiceVolumeVal">100</span>%)</label>
+              <input id="voiceVolumeInput" type="range" min="0" max="1" step="0.1" value="1.0" style="width:100%; margin-top:8px;" />
+            </div>
+          </div>
+          <div class="row-between" style="margin-bottom:12px;">
+            <label style="display:flex; align-items:center; gap:10px; font-size:13px; cursor:pointer;">
+              <input id="autoSpeakCheck" type="checkbox" style="width:18px; height:18px;" />
+              <span>Auto-speak FRIDAY replies</span>
+            </label>
+            <button id="testVoiceBtn" class="btn btn-sm" type="button">Test Voice</button>
+          </div>
+          <div id="voiceTestStatus" class="hidden" style="margin-bottom:10px; font-size:12px;"></div>
+          <button id="savePrefsBtn" class="btn btn-primary" type="button">Save Preferences</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Data Management</span>
+            <span class="badge blue mono" id="storageSizeBadge">0 KB</span>
+          </div>
+          <div class="row-gap">
+            <button id="exportDataBtn" class="btn" type="button">Export JSON Backup</button>
+            <label class="btn" for="importDataInput" style="cursor:pointer;">Import JSON Backup</label>
+            <input id="importDataInput" type="file" accept="application/json,.json" class="hidden" />
+            <button id="resetAllDataBtn" class="btn btn-danger" type="button">Reset All Data</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">About NEXUS</span>
+            <span class="badge">Phase 1 • v1.0</span>
+          </div>
+          <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+            <strong>NEXUS</strong> is a mobile-first, browser-based Personal Intelligence System built with modular HTML, CSS, and vanilla JavaScript. All notes, RPG progress, focus sessions, and settings persist locally in your browser without external backend tracking.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" aria-label="Primary Navigation">
+      <div class="bottom-nav-inner">
+        <button class="nav-tab active" type="button" data-nav="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Home</span>
+        </button>
+        <button class="nav-tab" type="button" data-nav="friday">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>FRIDAY</span>
+        </button>
+        <button class="nav-tab" type="button" data-nav="rpg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>RPG</span>
+        </button>
+        <button class="nav-tab" type="button" data-nav="brain">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Brain</span>
+        </button>
+        <button class="nav-tab" type="button" data-nav="studio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+          <span>Studio</span>
+        </button>
+        <button class="nav-tab" type="button" data-nav="phone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <span>Phone</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3 id="modalTitle">Confirm Action</h3>
+      <p id="modalMessage">Are you sure?</p>
+      <div class="modal-actions">
+        <button id="modalCancelBtn" class="btn" type="button">Cancel</button>
+        <button id="modalConfirmBtn" class="btn btn-danger" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'nexus_os_state_v1';
+
+      function getTodayKey() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      }
+
+      function createDefaultState() {
+        const today = getTodayKey();
+        return {
+          version: 1,
+          settings: {
+            userName: 'Operator',
+            theme: 'midnight-purple',
+            language: 'en',
+            personality: 'tactical',
+            provider: 'groq',
+            providers: {
+              groq: { apiKey: '', model: 'openai/gpt-oss-20b', customModel: '' },
+              openrouter: { apiKey: '', model: 'google/gemma-4-31b-it:free', customModel: '' },
+              gemini: { apiKey: '', model: 'gemini-2.5-flash', customModel: '' }
+            },
+            temperature: 0.7,
+            voiceURI: '',
+            voiceRate: 1.0,
+            voiceVolume: 1.0,
+            autoSpeak: false
+          },
+          chat: {
+            messages: [],
+            queriesByDate: {}
+          },
+          rpg: {
+            totalExp: 0,
+            questsCompletedTotal: 0,
+            focusClearedTotal: 0,
+            lastQuestDate: today,
+            quests: [
+              { id: 'q_focus', title: 'Complete a 25m Focus Session', exp: 35, done: false, builtin: true },
+              { id: 'q_note', title: 'Capture 1 insight in Second Brain', exp: 20, done: false, builtin: true },
+              { id: 'q_plan', title: 'Review daily priorities & activity', exp: 15, done: false, builtin: true }
+            ]
+          },
+          notes: [],
+          studio: {
+            history: []
+          },
+          phone: {
+            focusSessions: [],
+            manualLogs: []
+          },
+          activity: []
+        };
+      }
+
+      /* ---------------- Storage Service ---------------- */
+      const StorageService = {
+        load() {
+          const defaults = createDefaultState();
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return defaults;
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return defaults;
+
+            const merged = {
+              ...defaults,
+              ...parsed,
+              settings: (() => {
+                const rawSet = parsed.settings || {};
+                const rawProv = rawSet.providers || {};
+                const mergedProviders = {
+                  groq: { ...defaults.settings.providers.groq, ...(rawProv.groq || {}) },
+                  openrouter: { ...defaults.settings.providers.openrouter, ...(rawProv.openrouter || {}) },
+                  gemini: { ...defaults.settings.providers.gemini, ...(rawProv.gemini || {}) }
+                };
+                if (rawSet.apiKey && !mergedProviders.gemini.apiKey) {
+                  mergedProviders.gemini.apiKey = rawSet.apiKey;
+                  if (rawSet.model) mergedProviders.gemini.model = rawSet.model;
+                }
+                return {
+                  ...defaults.settings,
+                  ...rawSet,
+                  provider: (() => {
+                    const p = rawSet.provider;
+                    if (p === 'openrouter' && !mergedProviders.openrouter.apiKey && mergedProviders.groq.apiKey) {
+                      return 'groq';
+                    }
+                    if (['groq', 'openrouter', 'gemini'].includes(p)) return p;
+                    return rawSet.apiKey ? 'gemini' : 'groq';
+                  })(),
+                  providers: mergedProviders
+                };
+              })(),
+              chat: {
+                messages: Array.isArray(parsed.chat?.messages) ? parsed.chat.messages : [],
+                queriesByDate: parsed.chat?.queriesByDate && typeof parsed.chat.queriesByDate === 'object' ? parsed.chat.queriesByDate : {}
+              },
+              rpg: {
+                ...defaults.rpg,
+                ...(parsed.rpg || {}),
+                quests: Array.isArray(parsed.rpg?.quests) && parsed.rpg.quests.length ? parsed.rpg.quests : defaults.rpg.quests
+              },
+              notes: Array.isArray(parsed.notes) ? parsed.notes : [],
+              studio: {
+                history: Array.isArray(parsed.studio?.history) ? parsed.studio.history : []
+              },
+              phone: {
+                focusSessions: Array.isArray(parsed.phone?.focusSessions) ? parsed.phone.focusSessions : [],
+                manualLogs: Array.isArray(parsed.phone?.manualLogs) ? parsed.phone.manualLogs : []
+              },
+              activity: Array.isArray(parsed.activity) ? parsed.activity : []
+            };
+
+            // Reset daily quest completion flags if date rolled over
+            const today = getTodayKey();
+            if (merged.rpg.lastQuestDate !== today) {
+              merged.rpg.lastQuestDate = today;
+              merged.rpg.quests = merged.rpg.quests.map((q) => ({ ...q, done: false }));
+            }
+
+            return merged;
+          } catch (err) {
+            console.warn('Corrupted storage detected, falling back to safe defaults:', err);
+            return defaults;
+          }
+        },
+        save(state) {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            return true;
+          } catch (err) {
+            console.error('Failed to persist state:', err);
+            return false;
+          }
+        },
+        getSizeKB() {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY) || '';
+            return (new Blob([raw]).size / 1024).toFixed(1);
+          } catch {
+            return '0.0';
+          }
+        }
+      };
+
+      /* ---------------- AI Provider Service (Groq, OpenRouter, Gemini) ---------------- */
+      const PROVIDER_CATALOG = {
+        groq: {
+          label: 'Groq',
+          keyLabel: 'Groq API Key',
+          keyPlaceholder: 'gsk_...',
+          baseUrl: 'https://api.groq.com/openai/v1',
+          models: [
+            { id: 'openai/gpt-oss-20b', label: 'openai/gpt-oss-20b (Default)' },
+            { id: 'openai/gpt-oss-120b', label: 'openai/gpt-oss-120b' },
+            { id: 'qwen/qwen3.8-27b', label: 'qwen/qwen3.8-27b' }
+          ]
+        },
+        openrouter: {
+          label: 'OpenRouter',
+          keyLabel: 'OpenRouter API Key',
+          keyPlaceholder: 'sk-or-v1-...',
+          baseUrl: 'https://openrouter.ai/api/v1',
+          models: [
+            { id: 'google/gemma-4-31b-it:free', label: 'Google Gemma 4 31B IT (Free)' },
+            { id: 'nvidia/nemotron-3.5-lightning:free', label: 'NVIDIA Nemotron 3.5 Lightning (Free)' },
+            { id: 'nvidia/nemotron-3-super-120b-a12b:free', label: 'NVIDIA Nemotron 3 Super 120B (Free)' },
+            { id: 'qwen/qwen3.8-27b:free', label: 'Qwen 3.8 27B (Free)' },
+            { id: 'cohere/north-mini-code:free', label: 'Cohere North Mini Code (Free)' }
+          ]
+        },
+        gemini: {
+          label: 'Gemini',
+          keyLabel: 'Gemini API Key',
+          keyPlaceholder: 'AIza...',
+          baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+          models: [
+            { id: 'gemini-2.5-flash', label: 'gemini-2.5-flash' },
+            { id: 'gemini-2.5-pro', label: 'gemini-2.5-pro' },
+            { id: 'gemini-2.0-flash', label: 'gemini-2.0-flash' }
+          ]
+        }
+      };
+
+      const AIService = {
+        activeRequest: false,
+        connectionStatus: {
+          groq: 'untested',
+          openrouter: 'untested',
+          gemini: 'untested'
+        },
+        testMessages: {
+          groq: '',
+          openrouter: '',
+          gemini: ''
+        },
+
+        normalizeApiKey(raw) {
+          let key = String(raw || '').trim();
+          if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
+            key = key.slice(1, -1).trim();
+          }
+          if (/^bearer\s+/i.test(key)) {
+            key = key.replace(/^bearer\s+/i, '').trim();
+          }
+          return key;
+        },
+
+        sanitizeErrorText(text, key) {
+          let out = String(text || '');
+          if (key && key.length > 4) {
+            out = out.split(key).join('[REDACTED]');
+          }
+          out = out.replace(/gsk_[A-Za-z0-9_-]+/g, '[REDACTED]');
+          out = out.replace(/sk-or-v1-[A-Za-z0-9_-]+/g, '[REDACTED]');
+          out = out.replace(/AIza[A-Za-z0-9_-]+/g, '[REDACTED]');
+          return out;
+        },
+
+        getProviderConfig(settings, providerId) {
+          const provider = PROVIDER_CATALOG[providerId] ? providerId : 'groq';
+          const cfg = settings.providers?.[provider] || { apiKey: '', model: '', customModel: '' };
+          const apiKey = this.normalizeApiKey(cfg.apiKey);
+          const model = cfg.model === 'custom'
+            ? String(cfg.customModel || '').trim()
+            : String(cfg.model || PROVIDER_CATALOG[provider].models[0].id).trim();
+          return {
+            provider,
+            providerLabel: PROVIDER_CATALOG[provider].label,
+            apiKey,
+            model,
+            temperature: Number(settings.temperature) || 0.7
+          };
+        },
+
+        getActiveConfig(settings) {
+          return this.getProviderConfig(settings, settings.provider);
+        },
+
+        getStatusInfo(settings, providerId = null) {
+          const target = providerId || settings.provider;
+          const { provider, providerLabel, apiKey } = this.getProviderConfig(settings, target);
+          if (!apiKey) {
+            return { code: 'unset', label: 'Unset', dotClass: '', badgeClass: 'amber', providerLabel };
+          }
+          const st = this.connectionStatus[provider] || 'untested';
+          const map = {
+            untested: { label: 'Untested', dotClass: '', badgeClass: 'amber' },
+            testing: { label: 'Testing', dotClass: '', badgeClass: 'blue' },
+            connected: { label: 'Connected', dotClass: 'online', badgeClass: 'green' },
+            invalid_key: { label: 'Invalid Key', dotClass: 'offline', badgeClass: 'rose' },
+            model_unavailable: { label: 'Model Unavailable', dotClass: 'offline', badgeClass: 'rose' },
+            rate_limited: { label: 'Rate Limited', dotClass: 'offline', badgeClass: 'amber' },
+            insufficient_credits: { label: 'Insufficient Credits', dotClass: 'offline', badgeClass: 'rose' },
+            bad_request: { label: 'Bad Request (400)', dotClass: 'offline', badgeClass: 'rose' },
+            server_error: { label: 'Server Error', dotClass: 'offline', badgeClass: 'rose' },
+            network_error: { label: 'Network Error', dotClass: 'offline', badgeClass: 'rose' }
+          };
+          return { code: st, ...(map[st] || map.untested), providerLabel };
+        },
+
+        buildSystemInstruction(settings, mode = 'friday') {
+          const langRule = settings.language === 'hinglish'
+            ? 'Respond naturally in conversational Hinglish (a clean blend of English and Hindi in Roman script, easy to read on mobile).'
+            : 'Respond in clear, natural English.';
+
+          if (mode === 'story') {
+            return `You are NEXUS Creative Studio's story engine. Write vivid, engaging, well-paced stories with strong imagery. ${langRule}`;
+          }
+          if (mode === 'reel') {
+            return `You are NEXUS Creative Studio's short-form video scriptwriter. Format output with: [HOOK (0-3s)], [BODY / SCENES], [VISUAL CUES], and [CALL TO ACTION]. ${langRule}`;
+          }
+
+          const personalities = {
+            tactical: 'You are FRIDAY, a sharp, tactical, and concise personal AI operating system inside NEXUS. Keep answers structured and actionable.',
+            companion: 'You are FRIDAY, a warm, supportive, and intelligent personal AI companion inside NEXUS.',
+            mentor: 'You are FRIDAY, a calm, strategic mentor helping the user think clearly, prioritize, and grow.',
+            creative: 'You are FRIDAY, an imaginative creative partner inside NEXUS who sparks original ideas.'
+          };
+          const base = personalities[settings.personality] || personalities.tactical;
+          return `${base} User name: ${settings.userName || 'Operator'}. ${langRule}`;
+        },
+
+        async readErrorResponse(res, apiKey) {
+          const rawText = await res.text().catch(() => '');
+          let parsed = null;
+          try {
+            parsed = rawText ? JSON.parse(rawText) : null;
+          } catch {
+            parsed = null;
+          }
+          let extracted = '';
+          if (parsed && typeof parsed === 'object') {
+            if (typeof parsed.error === 'string') extracted = parsed.error;
+            else if (parsed.error && typeof parsed.error.message === 'string') extracted = parsed.error.message;
+            else if (typeof parsed.message === 'string') extracted = parsed.message;
+            else if (typeof parsed.detail === 'string') extracted = parsed.detail;
+            else if (parsed.error) extracted = JSON.stringify(parsed.error);
+          }
+          if (!extracted && rawText) {
+            extracted = rawText.trim().slice(0, 280);
+          }
+          const finalMsg = extracted ? `HTTP ${res.status}: ${extracted}` : `HTTP ${res.status}`;
+          return this.sanitizeErrorText(finalMsg, apiKey);
+        },
+
+        classifyHttpFailure(status, apiMsg) {
+          const lower = (apiMsg || '').toLowerCase();
+          if (status === 401 || status === 403 || lower.includes('invalid api key') || lower.includes('api key not valid') || lower.includes('incorrect api key') || lower.includes('unauthorized') || lower.includes('user not found')) {
+            return { code: 'INVALID_KEY', statusKey: 'invalid_key' };
+          }
+          if (status === 402 || lower.includes('insufficient credits') || lower.includes('more credits') || lower.includes('payment required')) {
+            return { code: 'INSUFFICIENT_CREDITS', statusKey: 'insufficient_credits' };
+          }
+          if (status === 404 || lower.includes('not a valid model') || lower.includes('model not found') || lower.includes('does not exist') || lower.includes('no endpoints found') || lower.includes('model_not_found')) {
+            return { code: 'MODEL_UNAVAILABLE', statusKey: 'model_unavailable' };
+          }
+          if (status === 429 || lower.includes('rate limit') || lower.includes('quota') || lower.includes('too many requests')) {
+            return { code: 'RATE_LIMITED', statusKey: 'rate_limited' };
+          }
+          if (status === 400) {
+            return { code: 'BAD_REQUEST', statusKey: 'bad_request' };
+          }
+          if (status >= 500) {
+            return { code: 'API_ERROR', statusKey: 'server_error' };
+          }
+          return { code: 'API_ERROR', statusKey: 'bad_request' };
+        },
+
+        async callOpenRouter({ apiKey, model, temperature, systemInstruction, messages, signal }) {
+          const endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+          const formattedMessages = [];
+          if (systemInstruction && systemInstruction.trim()) {
+            formattedMessages.push({ role: 'system', content: systemInstruction.trim() });
+          }
+          for (const m of messages) {
+            if (m && typeof m.content === 'string' && m.content.trim()) {
+              formattedMessages.push({
+                role: m.role === 'assistant' ? 'assistant' : 'user',
+                content: m.content
+              });
+            }
+          }
+          const payload = {
+            model,
+            messages: formattedMessages
+          };
+          if (temperature !== undefined && temperature !== null && !Number.isNaN(Number(temperature))) {
+            payload.temperature = Number(temperature);
+          }
+
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+            signal
+          });
+
+          if (!res.ok) {
+            const rawMsg = await this.readErrorResponse(res, apiKey);
+            const { code, statusKey } = this.classifyHttpFailure(res.status, rawMsg);
+            const err = new Error(`${code}:${rawMsg}`);
+            err.statusKey = statusKey;
+            throw err;
+          }
+          const data = await res.json().catch(() => ({}));
+
+          const content = data?.choices?.[0]?.message?.content;
+          const text = typeof content === 'string' ? content.trim() : '';
+          if (!text) {
+            throw new Error('EMPTY_RESPONSE');
+          }
+          return text;
+        },
+
+        async callGemini({ apiKey, model, temperature, systemInstruction, messages, signal }) {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+          const contents = messages.map((m) => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: m.content }]
+          }));
+          const payload = {
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            contents,
+            generationConfig: {
+              temperature: Number(temperature) || 0.7
+            }
+          };
+
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal
+          });
+
+          if (!res.ok) {
+            const rawMsg = await this.readErrorResponse(res, apiKey);
+            const { code, statusKey } = this.classifyHttpFailure(res.status, rawMsg);
+            const err = new Error(`${code}:${rawMsg}`);
+            err.statusKey = statusKey;
+            throw err;
+          }
+          const data = await res.json().catch(() => ({}));
+
+          const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('')?.trim();
+          if (!text) {
+            const blockReason = data?.candidates?.[0]?.finishReason || data?.promptFeedback?.blockReason;
+            throw new Error(blockReason ? `BLOCKED:${blockReason}` : 'EMPTY_RESPONSE');
+          }
+          return text;
+        },
+
+        async callGroq({ apiKey, model, temperature, systemInstruction, messages, signal }) {
+          const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+          const formattedMessages = [];
+          if (systemInstruction && systemInstruction.trim()) {
+            formattedMessages.push({ role: 'system', content: systemInstruction.trim() });
+          }
+          for (const m of messages) {
+            if (m && typeof m.content === 'string' && m.content.trim()) {
+              formattedMessages.push({
+                role: m.role === 'assistant' ? 'assistant' : 'user',
+                content: m.content
+              });
+            }
+          }
+          const payload = {
+            model,
+            messages: formattedMessages
+          };
+          if (temperature !== undefined && temperature !== null && !Number.isNaN(Number(temperature))) {
+            payload.temperature = Number(temperature);
+          }
+
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify(payload),
+            signal
+          });
+
+          if (!res.ok) {
+            const rawMsg = await this.readErrorResponse(res, apiKey);
+            const { code, statusKey } = this.classifyHttpFailure(res.status, rawMsg);
+            const err = new Error(`${code}:${rawMsg}`);
+            err.statusKey = statusKey;
+            throw err;
+          }
+          const data = await res.json().catch(() => ({}));
+
+          const content = data?.choices?.[0]?.message?.content;
+          const text = typeof content === 'string' ? content.trim() : '';
+          if (!text) {
+            throw new Error('EMPTY_RESPONSE');
+          }
+          return text;
+        },
+
+        async generate({ provider, apiKey, model, temperature, systemInstruction, messages }) {
+          const cleanKey = this.normalizeApiKey(apiKey);
+          const targetProvider = PROVIDER_CATALOG[provider] ? provider : 'groq';
+          if (!cleanKey) {
+            throw new Error('NO_API_KEY');
+          }
+          if (!model || !model.trim()) {
+            const err = new Error('MODEL_UNAVAILABLE:No model ID selected.');
+            err.statusKey = 'model_unavailable';
+            throw err;
+          }
+          if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+            this.connectionStatus[targetProvider] = 'network_error';
+            throw new Error('OFFLINE');
+          }
+          if (this.activeRequest) {
+            throw new Error('DUPLICATE_REQUEST');
+          }
+
+          this.activeRequest = true;
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+          try {
+            let reply = '';
+            if (targetProvider === 'groq') {
+              reply = await this.callGroq({ apiKey: cleanKey, model: model.trim(), temperature, systemInstruction, messages, signal: controller.signal });
+            } else if (targetProvider === 'openrouter') {
+              reply = await this.callOpenRouter({ apiKey: cleanKey, model: model.trim(), temperature, systemInstruction, messages, signal: controller.signal });
+            } else if (targetProvider === 'gemini') {
+              reply = await this.callGemini({ apiKey: cleanKey, model: model.trim(), temperature, systemInstruction, messages, signal: controller.signal });
+            }
+            this.connectionStatus[targetProvider] = 'connected';
+            return reply;
+          } catch (err) {
+            if (err.name === 'AbortError') {
+              this.connectionStatus[targetProvider] = 'network_error';
+              throw new Error('TIMEOUT');
+            }
+            if (err.statusKey) {
+              this.connectionStatus[targetProvider] = err.statusKey;
+            } else if (err.name === 'TypeError' || /network|failed to fetch/i.test(err.message || '')) {
+              this.connectionStatus[targetProvider] = 'network_error';
+              throw new Error('NETWORK_ERROR');
+            }
+            throw err;
+          } finally {
+            clearTimeout(timeoutId);
+            this.activeRequest = false;
+          }
+        },
+
+        formatError(err, providerLabel = 'AI Provider') {
+          const msg = err?.message || '';
+          if (msg === 'NO_API_KEY') return `No ${providerLabel} API key configured. Add your key in Settings first.`;
+          if (msg === 'OFFLINE' || msg === 'NETWORK_ERROR') return `Network error reaching ${providerLabel}. Check your connection and try again.`;
+          if (msg === 'DUPLICATE_REQUEST') return 'A request is already in progress. Please wait.';
+          if (msg === 'TIMEOUT') return 'Request timed out after 30 seconds. Please try again.';
+          if (msg.startsWith('INVALID_KEY:')) return `Invalid ${providerLabel} API key: ${msg.slice(12)}`;
+          if (msg.startsWith('INSUFFICIENT_CREDITS:')) return `Insufficient credits on ${providerLabel}: ${msg.slice(21)}`;
+          if (msg.startsWith('MODEL_UNAVAILABLE:')) return `Model unavailable on ${providerLabel}: ${msg.slice(18)}`;
+          if (msg.startsWith('RATE_LIMITED:')) return `Rate limited by ${providerLabel}: ${msg.slice(13)}`;
+          if (msg.startsWith('BLOCKED:')) return `Response was blocked (${msg.slice(8)}). Try rephrasing your prompt.`;
+          if (msg.startsWith('BAD_REQUEST:')) return `${providerLabel} request error: ${msg.slice(12)}`;
+          if (msg.startsWith('API_ERROR:')) return `${providerLabel} API error: ${msg.slice(10)}`;
+          if (msg === 'EMPTY_RESPONSE') return `${providerLabel} returned an empty response. Try again.`;
+          return `Network or request failure: ${this.sanitizeErrorText(msg, '') || 'Unknown error'}`;
+        }
+      };
+
+      /* ---------------- Voice Service ---------------- */
+      const VoiceService = {
+        recognition: null,
+        isListening: false,
+        isSpeaking: false,
+        SpeechRecognitionCtor: window.SpeechRecognition || window.webkitSpeechRecognition || null,
+        hasSynthesis: typeof window.speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined',
+
+        isRecognitionSupported() {
+          return Boolean(this.SpeechRecognitionCtor);
+        },
+
+        getVoices() {
+          if (!this.hasSynthesis) return [];
+          try {
+            return window.speechSynthesis.getVoices() || [];
+          } catch {
+            return [];
+          }
+        },
+
+        startListening({ lang, onResult, onStatus, onError, onEnd }) {
+          if (!this.SpeechRecognitionCtor) {
+            onError('Voice input is not supported in this browser. Try Chrome on Android.');
+            return;
+          }
+          if (this.isListening) {
+            this.stopListening();
+            return;
+          }
+          try {
+            const rec = new this.SpeechRecognitionCtor();
+            rec.lang = lang === 'hinglish' ? 'en-IN' : 'en-US';
+            rec.interimResults = true;
+            rec.maxAlternatives = 1;
+            rec.continuous = false;
+
+            rec.onstart = () => {
+              this.isListening = true;
+              onStatus('Listening... Speak now');
+            };
+            rec.onresult = (event) => {
+              let transcript = '';
+              let isFinal = false;
+              for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+                if (event.results[i].isFinal) isFinal = true;
+              }
+              onResult(transcript.trim(), isFinal);
+            };
+            rec.onerror = (event) => {
+              const map = {
+                'not-allowed': 'Microphone permission denied. Allow mic access in browser settings.',
+                'service-not-allowed': 'Speech recognition service is blocked in this browser.',
+                'no-speech': 'No speech detected. Please try speaking again.',
+                'audio-capture': 'No microphone found on this device.',
+                'network': 'Network error during speech recognition.'
+              };
+              onError(map[event.error] || `Voice input error: ${event.error}`);
+            };
+            rec.onend = () => {
+              this.isListening = false;
+              this.recognition = null;
+              onEnd();
+            };
+
+            this.recognition = rec;
+            rec.start();
+          } catch (err) {
+            this.isListening = false;
+            onError(`Could not start microphone: ${err.message || 'Unknown error'}`);
+          }
+        },
+
+        stopListening() {
+          if (this.recognition && this.isListening) {
+            try { this.recognition.stop(); } catch {}
+          }
+          this.isListening = false;
+        },
+
+        speechToken: 0,
+        activeMessageId: null,
+        lastAutoSpokenId: null,
+        voicesLoadedNoticeShown: false,
+        currentUtterance: null,
+
+        async ensureVoicesLoaded() {
+          if (!this.hasSynthesis) return [];
+          let voices = this.getVoices();
+          if (voices.length) return voices;
+          await new Promise((resolve) => {
+            let done = false;
+            const finish = () => {
+              if (!done) {
+                done = true;
+                window.speechSynthesis.removeEventListener?.('voiceschanged', finish);
+                resolve();
+              }
+            };
+            window.speechSynthesis.addEventListener?.('voiceschanged', finish);
+            setTimeout(finish, 450);
+          });
+          return this.getVoices();
+        },
+
+        detectLanguage(text, preferredMode) {
+          if (/[ऀ-ॿ]/.test(text)) return 'hi-IN';
+          const hinglishMatches = text.match(/\b(kya|hai|hain|nahi|haan|acha|accha|theek|bhai|yaar|kaise|kaisa|kaisi|karo|karna|karte|hota|hoti|mera|meri|mere|tera|tum|aap|hum|main|mein|aur|lekin|par|kyunki|kal|aaj|abhi|baad|chalo|samajh|batao|dekho|suno|bohot|bahut|thoda|zyada|shukriya|namaste)\b/gi);
+          if ((hinglishMatches && hinglishMatches.length >= 2) || preferredMode === 'hinglish') {
+            return 'en-IN';
+          }
+          return 'en-US';
+        },
+
+        selectBestVoice(voices, targetLang, preferredVoiceURI) {
+          if (!voices || !voices.length) return null;
+          if (preferredVoiceURI) {
+            const exact = voices.find((v) => v.voiceURI === preferredVoiceURI);
+            if (exact) return exact;
+          }
+          const lower = targetLang.toLowerCase();
+          const candidates = lower === 'hi-in'
+            ? ['hi-in', 'hi', 'en-in', 'en-us', 'en-gb', 'en']
+            : lower === 'en-in'
+              ? ['en-in', 'hi-in', 'en-gb', 'en-us', 'en']
+              : ['en-us', 'en-gb', 'en-in', 'en'];
+
+          for (const prefix of candidates) {
+            const match = voices.find((v) => (v.lang || '').toLowerCase().startsWith(prefix));
+            if (match) return match;
+          }
+          return voices[0] || null;
+        },
+
+        splitIntoChunks(text, maxLen = 220) {
+          const clean = String(text || '').trim();
+          if (!clean) return [];
+          if (clean.length <= maxLen) return [clean];
+          const sentences = clean.split(/(?<=[.!?।\n])\s+/);
+          const chunks = [];
+          let current = '';
+          for (const s of sentences) {
+            if (!s) continue;
+            if ((current + ' ' + s).trim().length <= maxLen) {
+              current = (current + ' ' + s).trim();
+            } else {
+              if (current) chunks.push(current);
+              if (s.length <= maxLen) {
+                current = s;
+              } else {
+                const words = s.split(/\s+/);
+                let part = '';
+                for (const w of words) {
+                  if ((part + ' ' + w).trim().length <= maxLen) {
+                    part = (part + ' ' + w).trim();
+                  } else {
+                    if (part) chunks.push(part);
+                    part = w;
+                  }
+                }
+                current = part;
+              }
+            }
+          }
+          if (current) chunks.push(current);
+          return chunks.length ? chunks : [clean];
+        },
+
+        speak(text, { messageId = null, preferredMode = 'en', voiceURI = '', rate = 1.0, pitch = 1.0, volume = 1.0, useDefaultVoice = false, onStart, onEnd, onError }) {
+          if (!this.hasSynthesis) {
+            const msg = 'SpeechSynthesis API is not supported in this browser.';
+            console.error('[NEXUS Voice]', msg);
+            onError?.(msg);
+            return;
+          }
+          const rawText = String(text || '').trim();
+          if (!rawText) return;
+
+          const wasBusy = Boolean(window.speechSynthesis.speaking || window.speechSynthesis.pending);
+          if (wasBusy) {
+            this.stopSpeaking();
+          }
+
+          const token = ++this.speechToken;
+          this.activeMessageId = messageId;
+
+          try {
+            const voices = this.getVoices();
+            let selectedVoice = null;
+            if (!useDefaultVoice && voiceURI && voices.length) {
+              selectedVoice = voices.find((v) => v.voiceURI === voiceURI) || null;
+            } else if (!useDefaultVoice && voices.length && preferredMode === 'hinglish') {
+              const targetLang = this.detectLanguage(rawText, preferredMode);
+              if (targetLang === 'hi-IN') {
+                selectedVoice = voices.find((v) => (v.lang || '').toLowerCase().startsWith('hi')) || null;
+              }
+            }
+
+            const chunks = this.splitIntoChunks(rawText, 220);
+            let idx = 0;
+            let retriedDefault = false;
+
+            const speakNextChunk = (forceDefault = false) => {
+              if (token !== this.speechToken) return;
+              if (idx >= chunks.length) {
+                this.isSpeaking = false;
+                this.activeMessageId = null;
+                this.currentUtterance = null;
+                onEnd?.();
+                return;
+              }
+
+              const utter = new SpeechSynthesisUtterance(chunks[idx]);
+              this.currentUtterance = utter;
+              if (!forceDefault && selectedVoice) {
+                utter.voice = selectedVoice;
+                utter.lang = selectedVoice.lang;
+              }
+              utter.rate = forceDefault ? 1 : Math.min(2, Math.max(0.5, Number(rate) || 1));
+              utter.pitch = forceDefault ? 1 : Math.min(2, Math.max(0, Number(pitch) || 1));
+              utter.volume = forceDefault ? 1 : Math.min(1, Math.max(0, volume !== undefined ? Number(volume) : 1));
+
+              utter.onstart = () => {
+                if (token !== this.speechToken) return;
+                if (!this.isSpeaking) {
+                  this.isSpeaking = true;
+                  onStart?.();
+                }
+              };
+              utter.onend = () => {
+                if (token !== this.speechToken) return;
+                idx += 1;
+                speakNextChunk(forceDefault);
+              };
+              utter.onerror = (e) => {
+                if (token !== this.speechToken) return;
+                const voiceCount = this.getVoices().length;
+                console.error('[NEXUS Voice] SpeechSynthesisUtterance error:', {
+                  error: e.error,
+                  type: e.type,
+                  charIndex: e.charIndex,
+                  elapsedTime: e.elapsedTime,
+                  voicesAvailable: voiceCount,
+                  protocol: location.protocol,
+                  speaking: window.speechSynthesis.speaking,
+                  pending: window.speechSynthesis.pending
+                });
+                if (!retriedDefault && !forceDefault && selectedVoice && e.error === 'synthesis-failed') {
+                  retriedDefault = true;
+                  speakNextChunk(true);
+                  return;
+                }
+                this.isSpeaking = false;
+                this.activeMessageId = null;
+                this.currentUtterance = null;
+                onEnd?.();
+                if (e.error !== 'interrupted' && e.error !== 'canceled') {
+                  const isContentUri = location.protocol === 'content:' || location.protocol === 'file:';
+                  const hint = e.error === 'synthesis-failed' && isContentUri
+                    ? ' — Android Chrome often blocks TTS on content:// or file:// URIs; host over https:// or localhost, and check Android Text-to-speech output settings.'
+                    : '';
+                  onError?.(`SpeechSynthesis error: ${e.error || 'unknown'} (voices: ${voiceCount})${hint}`);
+                }
+              };
+
+              window.speechSynthesis.speak(utter);
+            };
+
+            if (wasBusy) {
+              setTimeout(speakNextChunk, 60);
+            } else {
+              speakNextChunk();
+            }
+          } catch (err) {
+            if (token !== this.speechToken) return;
+            console.error('[NEXUS Voice] Exception during speak():', err);
+            this.isSpeaking = false;
+            this.activeMessageId = null;
+            onEnd?.();
+            onError?.(`SpeechSynthesis exception: ${err.message || 'Unknown error'}`);
+          }
+        },
+
+        stopSpeaking() {
+          this.speechToken += 1;
+          this.isSpeaking = false;
+          this.activeMessageId = null;
+          this.currentUtterance = null;
+          if (this.hasSynthesis && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) {
+            try { window.speechSynthesis.cancel(); } catch {}
+          }
+        }
+      };
+
+      /* ---------------- App State & Helpers ---------------- */
+      let state = StorageService.load();
+      let currentView = 'dashboard';
+      let currentStudioType = 'story';
+      let currentStudioOutput = '';
+      let orbState = 'idle';
+
+      // Focus timer runtime
+      let timerTotalSec = 25 * 60;
+      let timerRemainingSec = 25 * 60;
+      let timerInterval = null;
+      let timerRunning = false;
+
+      function saveAndRefresh() {
+        StorageService.save(state);
+        renderAll();
+      }
+
+      function logActivity(label, moduleName) {
+        state.activity.unshift({
+          id: 'act_' + Date.now() + Math.random().toString(36).slice(2, 6),
+          label,
+          module: moduleName,
+          ts: Date.now()
+        });
+        if (state.activity.length > 30) state.activity.length = 30;
+      }
+
+      function formatTimeShort(ts) {
+        return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const el = document.createElement('div');
+        el.className = `toast ${type}`;
+        el.textContent = message;
+        container.appendChild(el);
+        setTimeout(() => {
+          el.remove();
+        }, 3200);
+      }
+
+      let pendingModalConfirm = null;
+      function showConfirmModal(title, message, confirmText, onConfirm) {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalMessage').textContent = message;
+        document.getElementById('modalConfirmBtn').textContent = confirmText || 'Confirm';
+        pendingModalConfirm = onConfirm;
+        document.getElementById('confirmModal').classList.add('open');
+      }
+
+      function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.remove('open');
+        pendingModalConfirm = null;
+      }
+
+      async function copyText(text) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+          }
+          showToast('Copied to clipboard', 'success');
+        } catch {
+          showToast('Could not copy text', 'error');
+        }
+      }
+
+      function setOrbState(nextState) {
+        orbState = nextState;
+        const labels = {
+          idle: 'Idle • Ready',
+          listening: 'Listening...',
+          thinking: 'Thinking...',
+          speaking: 'Speaking...'
+        };
+        const dashOrb = document.getElementById('dashOrb');
+        const fridayOrb = document.getElementById('fridayOrb');
+        if (dashOrb) dashOrb.setAttribute('data-state', nextState);
+        if (fridayOrb) fridayOrb.setAttribute('data-state', nextState);
+        document.getElementById('dashOrbLabel').textContent = `FRIDAY • ${nextState.toUpperCase()}`;
+        document.getElementById('fridayOrbStatusText').textContent = labels[nextState] || 'Idle';
+      }
+
+      /* ---------------- Navigation ---------------- */
+      function navigateTo(view) {
+        if (currentView === 'friday' && view !== 'friday' && VoiceService.isSpeaking) {
+          VoiceService.stopSpeaking();
+          setOrbState('idle');
+        }
+        currentView = view;
+        document.querySelectorAll('.view-section').forEach((sec) => {
+          sec.classList.toggle('active', sec.id === `view-${view}`);
+        });
+        document.querySelectorAll('.nav-tab').forEach((tab) => {
+          tab.classList.toggle('active', tab.dataset.nav === view);
+        });
+        document.getElementById('openSettingsBtn').classList.toggle('active', view === 'settings');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      /* ---------------- RPG Calculations ---------------- */
+      function computeRpgStats() {
+        const exp = state.rpg.totalExp || 0;
+        const level = Math.floor(exp / 100) + 1;
+        const expInLevel = exp % 100;
+        let rank = 'E-Rank Hunter';
+        if (level >= 20) rank = 'S-Rank Monarch';
+        else if (level >= 15) rank = 'A-Rank Hunter';
+        else if (level >= 10) rank = 'B-Rank Hunter';
+        else if (level >= 6) rank = 'C-Rank Hunter';
+        else if (level >= 3) rank = 'D-Rank Hunter';
+
+        const today = getTodayKey();
+        const queriesToday = state.chat.queriesByDate[today] || 0;
+        const achievements = [
+          { id: 'a1', title: 'Awakened Operator', desc: 'Reach Hunter Level 2 (100 EXP)', unlocked: level >= 2 },
+          { id: 'a2', title: 'Neural Link', desc: 'Send your first FRIDAY AI query', unlocked: Object.values(state.chat.queriesByDate).some((n) => n > 0) || queriesToday > 0 },
+          { id: 'a3', title: 'Memory Architect', desc: 'Save 3 notes in Second Brain', unlocked: state.notes.length >= 3 },
+          { id: 'a4', title: 'Deep Focus', desc: 'Complete 1 measured focus session', unlocked: state.rpg.focusClearedTotal >= 1 },
+          { id: 'a5', title: 'Quest Master', desc: 'Complete 5 daily quests', unlocked: state.rpg.questsCompletedTotal >= 5 },
+          { id: 'a6', title: 'Creative Spark', desc: 'Generate 1 item in Creative Studio', unlocked: state.studio.history.length >= 1 }
+        ];
+        return { exp, level, expInLevel, rank, achievements };
+      }
+
+      function awardExp(amount, reason) {
+        const prevLevel = Math.floor((state.rpg.totalExp || 0) / 100) + 1;
+        state.rpg.totalExp = (state.rpg.totalExp || 0) + amount;
+        const nextLevel = Math.floor(state.rpg.totalExp / 100) + 1;
+        if (nextLevel > prevLevel) {
+          showToast(`Level Up! You reached Hunter Level ${nextLevel}`, 'success');
+          logActivity(`Reached Hunter Level ${nextLevel}`, 'LIFE RPG');
+        } else if (reason) {
+          showToast(`+${amount} EXP — ${reason}`, 'success');
+        }
+      }
+
+      /* ---------------- Render Functions ---------------- */
+      function updateClock() {
+        const now = new Date();
+        const hour = now.getHours();
+        let part = 'Good Evening';
+        if (hour < 12) part = 'Good Morning';
+        else if (hour < 17) part = 'Good Afternoon';
+        const name = state.settings.userName?.trim() || 'Operator';
+        document.getElementById('dashGreeting').textContent = `${part}, ${name}`;
+        document.getElementById('dashDate').textContent = now.toLocaleDateString(undefined, {
+          weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+        });
+        document.getElementById('dashTime').textContent = now.toLocaleTimeString([], {
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+      }
+
+      function renderHeaderAndTheme() {
+        document.body.setAttribute('data-theme', state.settings.theme || 'midnight-purple');
+        const statusInfo = AIService.getStatusInfo(state.settings);
+        const dot = document.getElementById('headerApiDot');
+        const lbl = document.getElementById('headerApiLabel');
+        dot.className = 'status-dot ' + statusInfo.dotClass;
+        lbl.textContent = `API: ${statusInfo.label}`;
+      }
+
+      function renderDashboard() {
+        const today = getTodayKey();
+        const focusToday = state.phone.focusSessions
+          .filter((s) => s.date === today)
+          .reduce((acc, s) => acc + s.minutes, 0);
+        const doneQuests = state.rpg.quests.filter((q) => q.done).length;
+        const totalQuests = state.rpg.quests.length;
+        const queriesToday = state.chat.queriesByDate[today] || 0;
+        const rpg = computeRpgStats();
+
+        document.getElementById('dashRpgBadge').textContent = `LVL ${rpg.level} • ${rpg.exp} EXP`;
+        document.getElementById('statFocusToday').textContent = `${focusToday}m`;
+        document.getElementById('statQuestsToday').textContent = `${doneQuests}/${totalQuests}`;
+        document.getElementById('statNotesCount').textContent = String(state.notes.length);
+        document.getElementById('statAiQueries').textContent = String(queriesToday);
+
+        // System status
+        const statusInfo = AIService.getStatusInfo(state.settings);
+        const sysEl = document.getElementById('dashSystemStatus');
+        sysEl.innerHTML = `
+          <div class="activity-item">
+            <span>AI (${escapeHtml(statusInfo.providerLabel)})</span>
+            <span class="badge ${statusInfo.badgeClass}">${escapeHtml(statusInfo.label)}</span>
+          </div>
+          <div class="activity-item">
+            <span>Voice Input (Mic)</span>
+            <span class="badge ${VoiceService.isRecognitionSupported() ? 'green' : 'rose'}">${VoiceService.isRecognitionSupported() ? 'Supported' : 'Unsupported'}</span>
+          </div>
+          <div class="activity-item">
+            <span>Voice Output (TTS)</span>
+            <span class="badge ${VoiceService.hasSynthesis ? 'green' : 'rose'}">${VoiceService.hasSynthesis ? 'Supported' : 'Unsupported'}</span>
+          </div>
+          <div class="activity-item">
+            <span>Local Storage</span>
+            <span class="badge blue mono">${StorageService.getSizeKB()} KB</span>
+          </div>
+        `;
+
+        // Recent Activity
+        const actEl = document.getElementById('dashRecentActivity');
+        document.getElementById('activityCountBadge').textContent = `${state.activity.length} events`;
+        if (!state.activity.length) {
+          actEl.innerHTML = `<div class="empty-state"><strong>No activity logged yet</strong>Complete a focus timer, add a note, or talk to FRIDAY to see live activity here.</div>`;
+        } else {
+          actEl.innerHTML = state.activity.slice(0, 6).map((a) => `
+            <div class="activity-item">
+              <div>
+                <div style="font-weight:500;">${escapeHtml(a.label)}</div>
+                <div style="font-size:11px; color:var(--text-secondary);">${escapeHtml(a.module)}</div>
+              </div>
+              <span class="activity-time mono">${formatTimeShort(a.ts)}</span>
+            </div>
+          `).join('');
+        }
+      }
+
+      function renderFriday() {
+        const { apiKey, providerLabel } = AIService.getActiveConfig(state.settings);
+        const hasKey = Boolean(apiKey);
+        document.getElementById('fridayApiBanner').classList.toggle('hidden', hasKey);
+        document.getElementById('fridayApiBannerText').textContent = `${providerLabel} API key is not configured. Configure your key in Settings to chat with FRIDAY.`;
+        document.getElementById('fridayPersonalitySelect').value = state.settings.personality || 'tactical';
+        document.getElementById('fridayLangToggle').textContent = state.settings.language === 'hinglish' ? 'Lang: Hinglish' : 'Lang: EN';
+        const voiceBtn = document.getElementById('fridayVoiceToggle');
+        voiceBtn.textContent = state.settings.autoSpeak ? 'Voice: On' : 'Voice: Off';
+        voiceBtn.classList.toggle('btn-primary', Boolean(state.settings.autoSpeak));
+        document.getElementById('fridayStopSpeakBtn').classList.toggle('hidden', !VoiceService.isSpeaking);
+
+        const box = document.getElementById('chatMessages');
+        if (!state.chat.messages.length) {
+          box.innerHTML = `
+            <div class="empty-state" style="margin:auto;">
+              <strong>FRIDAY AI (${escapeHtml(providerLabel)})</strong>
+              ${hasKey
+                ? 'Ask anything in English or Hinglish. Your conversation stays saved locally.'
+                : `Configure your ${escapeHtml(providerLabel)} API key in Settings to start chatting with FRIDAY.`}
+            </div>`;
+        } else {
+          box.innerHTML = state.chat.messages.map((m) => {
+            const cls = m.role === 'user' ? 'user' : (m.isError ? 'assistant error' : 'assistant');
+            return `
+              <div class="msg-row ${cls}">
+                <div class="msg-bubble">${escapeHtml(m.text)}</div>
+                <div class="msg-meta">
+                  <span>${m.role === 'user' ? 'You' : 'FRIDAY'} • ${formatTimeShort(m.ts)}</span>
+                  ${m.role === 'assistant' && !m.isError ? `
+                    <button class="msg-action-btn" type="button" data-copy-msg="${m.id}">Copy</button>
+                    <button class="msg-action-btn" type="button" data-speak-msg="${m.id}">${VoiceService.isSpeaking && VoiceService.activeMessageId === m.id ? 'Stop' : 'Play'}</button>
+                  ` : ''}
+                </div>
+              </div>
+            `;
+          }).join('');
+          box.scrollTop = box.scrollHeight;
+        }
+      }
+
+      function renderRpg() {
+        const rpg = computeRpgStats();
+        document.getElementById('rpgRankBadge').textContent = rpg.rank;
+        document.getElementById('rpgLevelDisplay').textContent = `Level ${rpg.level}`;
+        document.getElementById('rpgExpText').textContent = `${rpg.expInLevel} / 100 EXP to Level ${rpg.level + 1}`;
+        document.getElementById('rpgTotalExp').textContent = String(rpg.exp);
+        document.getElementById('rpgExpBar').style.width = `${rpg.expInLevel}%`;
+        document.getElementById('rpgQuestsCompleted').textContent = String(state.rpg.questsCompletedTotal || 0);
+        const unlockedCount = rpg.achievements.filter((a) => a.unlocked).length;
+        document.getElementById('rpgAchievementsUnlocked').textContent = `${unlockedCount}/${rpg.achievements.length}`;
+        document.getElementById('rpgFocusCount').textContent = String(state.rpg.focusClearedTotal || 0);
+        document.getElementById('rpgQuestDateBadge').textContent = state.rpg.lastQuestDate;
+
+        const qList = document.getElementById('rpgQuestList');
+        qList.innerHTML = state.rpg.quests.map((q) => `
+          <div class="list-row ${q.done ? 'completed' : ''}">
+            <div style="flex:1;">
+              <div style="font-weight:600; font-size:14px; ${q.done ? 'text-decoration:line-through;' : ''}">${escapeHtml(q.title)}</div>
+              <div style="font-size:12px; color:var(--text-secondary);">Reward: +${q.exp} EXP</div>
+            </div>
+            <div class="row-gap">
+              <button class="btn btn-sm ${q.done ? '' : 'btn-primary'}" type="button" data-toggle-quest="${q.id}" ${q.done ? 'disabled' : ''}>
+                ${q.done ? 'Cleared' : 'Complete'}
+              </button>
+              ${!q.builtin ? `<button class="btn btn-sm btn-danger" type="button" data-delete-quest="${q.id}">Del</button>` : ''}
+            </div>
+          </div>
+        `).join('');
+
+        const aList = document.getElementById('rpgAchievementList');
+        aList.innerHTML = rpg.achievements.map((a) => `
+          <div class="list-row ${a.unlocked ? '' : 'completed'}">
+            <div>
+              <div style="font-weight:600; font-size:14px;">${escapeHtml(a.title)}</div>
+              <div style="font-size:12px; color:var(--text-secondary);">${escapeHtml(a.desc)}</div>
+            </div>
+            <span class="badge ${a.unlocked ? 'green' : ''}">${a.unlocked ? 'Unlocked' : 'Locked'}</span>
+          </div>
+        `).join('');
+      }
+
+      function renderBrain() {
+        const query = (document.getElementById('noteSearchInput').value || '').trim().toLowerCase();
+        const tagFilter = document.getElementById('noteFilterTag').value;
+        document.getElementById('notesTotalBadge').textContent = `${state.notes.length} notes`;
+
+        const filtered = state.notes.filter((n) => {
+          const matchesTag = tagFilter === 'ALL' || n.tag === tagFilter;
+          const matchesQuery = !query ||
+            n.title.toLowerCase().includes(query) ||
+            n.body.toLowerCase().includes(query) ||
+            n.tag.toLowerCase().includes(query);
+          return matchesTag && matchesQuery;
+        });
+
+        const list = document.getElementById('notesList');
+        if (!filtered.length) {
+          list.innerHTML = `<div class="empty-state"><strong>${state.notes.length ? 'No matching notes' : 'Second Brain is empty'}</strong>${state.notes.length ? 'Try another search term or tag.' : 'Create your first note above to store ideas locally.'}</div>`;
+          return;
+        }
+
+        list.innerHTML = filtered.map((n) => `
+          <div class="list-row">
+            <div style="flex:1; min-width:0;">
+              <div class="row-gap" style="margin-bottom:4px;">
+                <strong style="font-size:14px;">${escapeHtml(n.title)}</strong>
+                <span class="badge blue">${escapeHtml(n.tag)}</span>
+              </div>
+              <p style="font-size:13px; color:var(--text-secondary); white-space:pre-wrap; word-break:break-word;">${escapeHtml(n.body)}</p>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Updated ${new Date(n.updatedAt).toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+            </div>
+            <div class="row-gap" style="flex-shrink:0;">
+              <button class="btn btn-sm" type="button" data-edit-note="${n.id}">Edit</button>
+              <button class="btn btn-sm btn-danger" type="button" data-delete-note="${n.id}">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderStudio() {
+        const { apiKey, providerLabel } = AIService.getActiveConfig(state.settings);
+        const hasKey = Boolean(apiKey);
+        document.getElementById('studioProviderBadge').textContent = `${providerLabel} Powered`;
+        document.getElementById('studioApiBanner').classList.toggle('hidden', hasKey);
+        document.getElementById('studioApiBannerText').textContent = `Configure your ${providerLabel} API key in Settings to generate stories and reel scripts.`;
+        document.getElementById('studioGenerateBtn').textContent = currentStudioType === 'story' ? 'Generate Story' : 'Generate Reel Script';
+        document.getElementById('studioHistoryCount').textContent = `${state.studio.history.length} saved`;
+
+        const hList = document.getElementById('studioHistoryList');
+        if (!state.studio.history.length) {
+          hList.innerHTML = `<div class="empty-state"><strong>No generations yet</strong>Choose Story or Reel Script above and enter a prompt.</div>`;
+        } else {
+          hList.innerHTML = state.studio.history.slice(0, 8).map((item) => `
+            <div class="list-row">
+              <div style="flex:1; min-width:0;">
+                <div class="row-gap" style="margin-bottom:4px;">
+                  <span class="badge">${item.type === 'story' ? 'Story' : 'Reel Script'}</span>
+                  <span style="font-size:12px; color:var(--text-muted);">${formatTimeShort(item.ts)}</span>
+                </div>
+                <div style="font-size:13px; font-weight:600; margin-bottom:4px;">${escapeHtml(item.prompt)}</div>
+              </div>
+              <button class="btn btn-sm" type="button" data-view-studio="${item.id}">Open</button>
+            </div>
+          `).join('');
+        }
+      }
+
+      function formatTimerMMSS(sec) {
+        const m = String(Math.floor(sec / 60)).padStart(2, '0');
+        const s = String(sec % 60).padStart(2, '0');
+        return `${m}:${s}`;
+      }
+
+      function renderPhone() {
+        const today = getTodayKey();
+        const measuredFocus = state.phone.focusSessions
+          .filter((s) => s.date === today)
+          .reduce((acc, s) => acc + s.minutes, 0);
+        const manualProd = state.phone.manualLogs
+          .filter((l) => l.date === today && l.category === 'productive')
+          .reduce((acc, l) => acc + l.minutes, 0);
+        const manualDist = state.phone.manualLogs
+          .filter((l) => l.date === today && l.category === 'distracting')
+          .reduce((acc, l) => acc + l.minutes, 0);
+
+        const totalProd = measuredFocus + manualProd;
+        const denom = totalProd + manualDist;
+        const score = denom > 0 ? Math.round((totalProd / denom) * 100) + '%' : '—';
+
+        document.getElementById('phoneMeasuredFocus').textContent = `${measuredFocus}m`;
+        document.getElementById('phoneManualProductive').textContent = `${manualProd}m`;
+        document.getElementById('phoneManualDistracting').textContent = `${manualDist}m`;
+        document.getElementById('phoneProductivityBadge').textContent = `Score: ${score}`;
+        document.getElementById('focusTimerDisplay').textContent = formatTimerMMSS(timerRemainingSec);
+
+        // Combine measured focus + manual logs for display with clear source badges
+        const combined = [
+          ...state.phone.focusSessions.map((s) => ({
+            id: s.id,
+            title: `Focus Timer (${s.minutes}m)`,
+            category: 'productive',
+            source: 'Measured',
+            minutes: s.minutes,
+            ts: s.ts,
+            isManual: false
+          })),
+          ...state.phone.manualLogs.map((l) => ({
+            id: l.id,
+            title: l.app,
+            category: l.category,
+            source: 'Manual',
+            minutes: l.minutes,
+            ts: l.ts,
+            isManual: true
+          }))
+        ].sort((a, b) => b.ts - a.ts);
+
+        const list = document.getElementById('phoneLogList');
+        if (!combined.length) {
+          list.innerHTML = `<div class="empty-state"><strong>No sessions or logs yet</strong>Run the Focus Timer or manually log app usage above.</div>`;
+        } else {
+          list.innerHTML = combined.slice(0, 15).map((item) => {
+            const catClass = item.category === 'productive' ? 'green' : (item.category === 'distracting' ? 'rose' : 'blue');
+            return `
+              <div class="list-row">
+                <div>
+                  <div class="row-gap">
+                    <strong style="font-size:14px;">${escapeHtml(item.title)}</strong>
+                    <span class="badge ${item.isManual ? 'amber' : 'blue'}">${item.source}</span>
+                    <span class="badge ${catClass}">${item.category}</span>
+                  </div>
+                  <div style="font-size:12px; color:var(--text-secondary); margin-top:3px;">${item.minutes} min • ${formatTimeShort(item.ts)}</div>
+                </div>
+                ${item.isManual ? `<button class="btn btn-sm btn-danger" type="button" data-delete-log="${item.id}">Del</button>` : ''}
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      function populateVoices() {
+        const select = document.getElementById('voiceSelect');
+        if (!VoiceService.hasSynthesis) {
+          select.innerHTML = `<option value="">Speech Synthesis Unsupported</option>`;
+          select.disabled = true;
+          return;
+        }
+        const voices = VoiceService.getVoices();
+        if (!voices.length) {
+          select.innerHTML = `<option value="">Default System Voice</option>`;
+          return;
+        }
+        select.innerHTML = `<option value="">Auto (Best English / Hindi / Hinglish Voice)</option>` + voices.map((v) =>
+          `<option value="${escapeHtml(v.voiceURI)}">${escapeHtml(v.name)} (${escapeHtml(v.lang)})</option>`
+        ).join('');
+        select.value = state.settings.voiceURI || '';
+      }
+
+      function renderProviderCards() {
+        const container = document.getElementById('providerCardsContainer');
+        const activeProvider = PROVIDER_CATALOG[state.settings.provider] ? state.settings.provider : 'groq';
+
+        container.innerHTML = ['groq', 'openrouter', 'gemini'].map((pid) => {
+          const catalog = PROVIDER_CATALOG[pid];
+          const cfg = state.settings.providers?.[pid] || { apiKey: '', model: catalog.models[0].id, customModel: '' };
+          const st = AIService.getStatusInfo(state.settings, pid);
+          const isActive = pid === activeProvider;
+          const isKnown = catalog.models.some((m) => m.id === cfg.model);
+          const selectedModel = cfg.model === 'custom' || !isKnown ? 'custom' : cfg.model;
+          const customModelVal = cfg.customModel || (!isKnown && cfg.model !== 'custom' ? cfg.model : '');
+          const testMsg = AIService.testMessages[pid] || '';
+          const testColor = st.code === 'connected' ? 'var(--accent-emerald)' : (st.code === 'testing' ? 'var(--text-secondary)' : 'var(--accent-rose)');
+
+          const modelOptions = catalog.models
+            .map((m) => `<option value="${escapeHtml(m.id)}" ${selectedModel === m.id ? 'selected' : ''}>${escapeHtml(m.label)}</option>`)
+            .join('') + `<option value="custom" ${selectedModel === 'custom' ? 'selected' : ''}>Custom Model ID...</option>`;
+
+          return `
+            <div class="list-row" style="flex-direction:column; align-items:stretch; border-color:${isActive ? 'var(--border-glow)' : 'rgba(255,255,255,0.08)'};">
+              <div class="row-between">
+                <div class="row-gap">
+                  <strong style="font-size:14px;">${escapeHtml(catalog.label)}</strong>
+                  ${isActive ? '<span class="badge blue">Active</span>' : ''}
+                </div>
+                <span class="badge ${st.badgeClass}">${escapeHtml(st.label)}</span>
+              </div>
+              <div class="field-group" style="margin-bottom:8px;">
+                <label class="field-label" for="key_${pid}">${escapeHtml(catalog.keyLabel)}</label>
+                <div class="row-gap">
+                  <input id="key_${pid}" class="input" style="flex:1;" type="password" value="${escapeHtml(AIService.normalizeApiKey(cfg.apiKey))}" placeholder="${escapeHtml(catalog.keyPlaceholder)}" autocomplete="off" />
+                  <button class="btn btn-sm" type="button" data-toggle-vis="${pid}">Show</button>
+                </div>
+              </div>
+              <div class="field-group" style="margin-bottom:8px;">
+                <label class="field-label" for="model_${pid}">Model</label>
+                <select id="model_${pid}" class="select" data-provider-model="${pid}">${modelOptions}</select>
+              </div>
+              <div id="custom_group_${pid}" class="field-group ${selectedModel === 'custom' ? '' : 'hidden'}" style="margin-bottom:8px;">
+                <label class="field-label" for="custom_model_${pid}">Custom Model ID</label>
+                <input id="custom_model_${pid}" class="input" type="text" value="${escapeHtml(customModelVal)}" placeholder="Enter model ID..." autocomplete="off" />
+              </div>
+              <div class="row-gap">
+                <button class="btn btn-primary btn-sm" type="button" data-save-provider="${pid}">Save</button>
+                <button class="btn btn-sm" type="button" data-test-provider="${pid}" ${st.code === 'testing' ? 'disabled' : ''}>Test Connection</button>
+                <button class="btn btn-danger btn-sm" type="button" data-clear-provider="${pid}">Remove Key</button>
+              </div>
+              ${testMsg ? `<div style="font-size:12px; color:${testColor}; margin-top:4px;">${escapeHtml(testMsg)}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderSettings() {
+        const s = state.settings;
+        const statusInfo = AIService.getStatusInfo(s);
+        const badge = document.getElementById('settingsApiBadge');
+        badge.textContent = `${statusInfo.providerLabel}: ${statusInfo.label}`;
+        badge.className = `badge ${statusInfo.badgeClass}`;
+
+        const activeProvider = PROVIDER_CATALOG[s.provider] ? s.provider : 'groq';
+        document.getElementById('apiProviderSelect').value = activeProvider;
+        renderProviderCards();
+        document.getElementById('apiTempInput').value = s.temperature ?? 0.7;
+        document.getElementById('apiTempVal').textContent = String(s.temperature ?? 0.7);
+        document.getElementById('userNameInput').value = s.userName || 'Operator';
+        document.getElementById('themeSelect').value = s.theme || 'midnight-purple';
+        document.getElementById('languageSelect').value = s.language || 'en';
+        document.getElementById('voiceRateInput').value = s.voiceRate ?? 1.0;
+        document.getElementById('voiceRateVal').textContent = String(s.voiceRate ?? 1.0);
+        document.getElementById('voiceVolumeInput').value = s.voiceVolume ?? 1.0;
+        document.getElementById('voiceVolumeVal').textContent = String(Math.round((s.voiceVolume ?? 1.0) * 100));
+        document.getElementById('autoSpeakCheck').checked = Boolean(s.autoSpeak);
+        document.getElementById('storageSizeBadge').textContent = `${StorageService.getSizeKB()} KB`;
+        populateVoices();
+      }
+
+      function renderAll() {
+        renderHeaderAndTheme();
+        renderDashboard();
+        renderFriday();
+        renderRpg();
+        renderBrain();
+        renderStudio();
+        renderPhone();
+        renderSettings();
+      }
+
+      /* ---------------- Event Handlers ---------------- */
+      // Navigation delegation
+      document.addEventListener('click', (e) => {
+        const navBtn = e.target.closest('[data-nav]');
+        if (navBtn) {
+          navigateTo(navBtn.dataset.nav);
+          return;
+        }
+      });
+
+      document.getElementById('openSettingsBtn').addEventListener('click', () => navigateTo('settings'));
+      document.getElementById('headerApiStatusBtn').addEventListener('click', () => navigateTo('settings'));
+      document.getElementById('dashOrbTrigger').addEventListener('click', () => navigateTo('friday'));
+      document.getElementById('dashOrbTrigger').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') navigateTo('friday');
+      });
+
+      // Quick actions on Dashboard
+      document.getElementById('qaStartFocusBtn').addEventListener('click', () => {
+        navigateTo('phone');
+        setTimerMinutes(25);
+        startFocusTimer();
+      });
+      document.getElementById('qaNewNoteBtn').addEventListener('click', () => {
+        navigateTo('brain');
+        document.getElementById('noteTitleInput').focus();
+      });
+
+      // Modal buttons
+      document.getElementById('modalCancelBtn').addEventListener('click', closeConfirmModal);
+      document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+        if (typeof pendingModalConfirm === 'function') pendingModalConfirm();
+        closeConfirmModal();
+      });
+
+      /* -------- FRIDAY AI Chat & Voice -------- */
+      async function sendFridayMessage(text) {
+        const trimmed = text.trim();
+        if (!trimmed) return;
+        if (AIService.activeRequest) {
+          showToast('FRIDAY is still thinking...', 'info');
+          return;
+        }
+
+        const userMsg = { id: 'm_' + Date.now(), role: 'user', text: trimmed, ts: Date.now() };
+        state.chat.messages.push(userMsg);
+        const today = getTodayKey();
+        state.chat.queriesByDate[today] = (state.chat.queriesByDate[today] || 0) + 1;
+        saveAndRefresh();
+
+        const sendBtn = document.getElementById('sendChatBtn');
+        sendBtn.disabled = true;
+        document.getElementById('typingRow').classList.remove('hidden');
+        setOrbState('thinking');
+
+        // Build last 12 valid turns for context
+        const historyMessages = state.chat.messages
+          .filter((m) => !m.isError)
+          .slice(-12)
+          .map((m) => ({
+            role: m.role === 'user' ? 'user' : 'assistant',
+            content: m.text
+          }));
+
+        const cfg = AIService.getActiveConfig(state.settings);
+        try {
+          const reply = await AIService.generate({
+            provider: cfg.provider,
+            apiKey: cfg.apiKey,
+            model: cfg.model,
+            temperature: cfg.temperature,
+            systemInstruction: AIService.buildSystemInstruction(state.settings, 'friday'),
+            messages: historyMessages
+          });
+
+          const assistantMsgId = 'm_' + (Date.now() + 1);
+          state.chat.messages.push({
+            id: assistantMsgId,
+            role: 'assistant',
+            text: reply,
+            ts: Date.now()
+          });
+          awardExp(5, 'FRIDAY Interaction');
+          logActivity('Asked FRIDAY AI', 'FRIDAY');
+          saveAndRefresh();
+
+          if (state.settings.autoSpeak && VoiceService.hasSynthesis && currentView === 'friday' && VoiceService.lastAutoSpokenId !== assistantMsgId) {
+            VoiceService.lastAutoSpokenId = assistantMsgId;
+            VoiceService.speak(reply, {
+              messageId: assistantMsgId,
+              preferredMode: state.settings.language,
+              voiceURI: state.settings.voiceURI,
+              rate: state.settings.voiceRate,
+              volume: state.settings.voiceVolume ?? 1.0,
+              onStart: () => {
+                setOrbState('speaking');
+                renderFriday();
+              },
+              onEnd: () => {
+                setOrbState('idle');
+                renderFriday();
+              },
+              onError: (msg) => showToast(msg, 'error')
+            });
+          } else {
+            setOrbState('idle');
+          }
+        } catch (err) {
+          const errText = AIService.formatError(err, cfg.providerLabel);
+          state.chat.messages.push({
+            id: 'm_' + (Date.now() + 1),
+            role: 'assistant',
+            text: errText,
+            isError: true,
+            ts: Date.now()
+          });
+          saveAndRefresh();
+          setOrbState('idle');
+          showToast(errText, 'error');
+        } finally {
+          sendBtn.disabled = false;
+          document.getElementById('typingRow').classList.add('hidden');
+        }
+      }
+
+      document.getElementById('chatForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('chatInput');
+        const val = input.value;
+        if (!val.trim()) return;
+        input.value = '';
+        sendFridayMessage(val);
+      });
+
+      document.getElementById('chatInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          document.getElementById('chatForm').requestSubmit();
+        }
+      });
+
+      document.getElementById('fridayPersonalitySelect').addEventListener('change', (e) => {
+        state.settings.personality = e.target.value;
+        saveAndRefresh();
+        showToast('FRIDAY personality updated', 'success');
+      });
+
+      document.getElementById('fridayLangToggle').addEventListener('click', () => {
+        state.settings.language = state.settings.language === 'hinglish' ? 'en' : 'hinglish';
+        saveAndRefresh();
+        showToast(`Language set to ${state.settings.language === 'hinglish' ? 'Hinglish' : 'English'}`, 'success');
+      });
+
+      document.getElementById('fridayVoiceToggle').addEventListener('click', () => {
+        state.settings.autoSpeak = !state.settings.autoSpeak;
+        if (!state.settings.autoSpeak && VoiceService.isSpeaking) {
+          VoiceService.stopSpeaking();
+          setOrbState('idle');
+        }
+        saveAndRefresh();
+        showToast(`FRIDAY Voice ${state.settings.autoSpeak ? 'Enabled' : 'Disabled'}`, 'info');
+      });
+
+      document.getElementById('fridayStopSpeakBtn').addEventListener('click', () => {
+        VoiceService.stopSpeaking();
+        setOrbState('idle');
+        renderFriday();
+      });
+
+      document.getElementById('clearChatBtn').addEventListener('click', () => {
+        if (!state.chat.messages.length) return;
+        showConfirmModal('Clear Conversation', 'Delete all FRIDAY chat messages from local history?', 'Clear Chat', () => {
+          VoiceService.stopSpeaking();
+          state.chat.messages = [];
+          saveAndRefresh();
+          showToast('Conversation cleared', 'info');
+        });
+      });
+
+      // Copy & Speak message actions
+      document.getElementById('chatMessages').addEventListener('click', (e) => {
+        const copyBtn = e.target.closest('[data-copy-msg]');
+        if (copyBtn) {
+          const msg = state.chat.messages.find((m) => m.id === copyBtn.dataset.copyMsg);
+          if (msg) copyText(msg.text);
+          return;
+        }
+        const speakBtn = e.target.closest('[data-speak-msg]');
+        if (speakBtn) {
+          const msgId = speakBtn.dataset.speakMsg;
+          if (VoiceService.isSpeaking && VoiceService.activeMessageId === msgId) {
+            VoiceService.stopSpeaking();
+            setOrbState('idle');
+            renderFriday();
+            return;
+          }
+          const msg = state.chat.messages.find((m) => m.id === msgId);
+          if (msg) {
+            VoiceService.speak(msg.text, {
+              messageId: msg.id,
+              preferredMode: state.settings.language,
+              voiceURI: state.settings.voiceURI,
+              rate: state.settings.voiceRate,
+              volume: state.settings.voiceVolume ?? 1.0,
+              onStart: () => {
+                setOrbState('speaking');
+                renderFriday();
+              },
+              onEnd: () => {
+                setOrbState('idle');
+                renderFriday();
+              },
+              onError: (errMsg) => showToast(errMsg, 'error')
+            });
+          }
+        }
+      });
+
+      // Voice Input
+      document.getElementById('voiceInputBtn').addEventListener('click', () => {
+        const banner = document.getElementById('voiceStatusBanner');
+        const msgEl = document.getElementById('voiceStatusMsg');
+        VoiceService.startListening({
+          lang: state.settings.language,
+          onStatus: (status) => {
+            banner.classList.remove('hidden');
+            msgEl.textContent = status;
+            setOrbState('listening');
+          },
+          onResult: (transcript, isFinal) => {
+            document.getElementById('chatInput').value = transcript;
+            msgEl.textContent = isFinal ? 'Captured: ' + transcript : 'Hearing: ' + transcript;
+          },
+          onError: (errMsg) => {
+            banner.classList.add('hidden');
+            setOrbState('idle');
+            showToast(errMsg, 'error');
+          },
+          onEnd: () => {
+            banner.classList.add('hidden');
+            if (orbState === 'listening') setOrbState('idle');
+          }
+        });
+      });
+
+      document.getElementById('stopVoiceInputBtn').addEventListener('click', () => {
+        VoiceService.stopListening();
+        document.getElementById('voiceStatusBanner').classList.add('hidden');
+        setOrbState('idle');
+      });
+
+      /* -------- LIFE RPG -------- */
+      document.getElementById('addQuestForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('newQuestInput');
+        const title = input.value.trim();
+        if (!title) return;
+        state.rpg.quests.push({
+          id: 'q_' + Date.now(),
+          title,
+          exp: 25,
+          done: false,
+          builtin: false
+        });
+        input.value = '';
+        logActivity(`Added quest: ${title}`, 'LIFE RPG');
+        saveAndRefresh();
+      });
+
+      document.getElementById('rpgQuestList').addEventListener('click', (e) => {
+        const toggleBtn = e.target.closest('[data-toggle-quest]');
+        if (toggleBtn) {
+          const q = state.rpg.quests.find((item) => item.id === toggleBtn.dataset.toggleQuest);
+          if (q && !q.done) {
+            q.done = true;
+            state.rpg.questsCompletedTotal = (state.rpg.questsCompletedTotal || 0) + 1;
+            awardExp(q.exp, q.title);
+            logActivity(`Completed quest: ${q.title}`, 'LIFE RPG');
+            saveAndRefresh();
+          }
+          return;
+        }
+        const delBtn = e.target.closest('[data-delete-quest]');
+        if (delBtn) {
+          state.rpg.quests = state.rpg.quests.filter((item) => item.id !== delBtn.dataset.deleteQuest);
+          saveAndRefresh();
+        }
+      });
+
+      /* -------- SECOND BRAIN -------- */
+      function resetNoteForm() {
+        document.getElementById('editingNoteId').value = '';
+        document.getElementById('noteTitleInput').value = '';
+        document.getElementById('noteBodyInput').value = '';
+        document.getElementById('noteTagSelect').value = 'Idea';
+        document.getElementById('noteFormTitle').textContent = 'Create Note';
+        document.getElementById('saveNoteBtn').textContent = 'Save Note';
+        document.getElementById('cancelEditNoteBtn').classList.add('hidden');
+      }
+
+      document.getElementById('noteForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const editId = document.getElementById('editingNoteId').value;
+        const title = document.getElementById('noteTitleInput').value.trim();
+        const body = document.getElementById('noteBodyInput').value.trim();
+        const tag = document.getElementById('noteTagSelect').value;
+        if (!title || !body) return;
+
+        if (editId) {
+          const note = state.notes.find((n) => n.id === editId);
+          if (note) {
+            note.title = title;
+            note.body = body;
+            note.tag = tag;
+            note.updatedAt = Date.now();
+            logActivity(`Updated note: ${title}`, 'SECOND BRAIN');
+            showToast('Note updated', 'success');
+          }
+        } else {
+          state.notes.unshift({
+            id: 'note_' + Date.now(),
+            title,
+            body,
+            tag,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+          awardExp(15, 'Note Captured');
+          logActivity(`Created note: ${title}`, 'SECOND BRAIN');
+        }
+        resetNoteForm();
+        saveAndRefresh();
+      });
+
+      document.getElementById('cancelEditNoteBtn').addEventListener('click', resetNoteForm);
+      document.getElementById('noteSearchInput').addEventListener('input', renderBrain);
+      document.getElementById('noteFilterTag').addEventListener('change', renderBrain);
+
+      document.getElementById('notesList').addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit-note]');
+        if (editBtn) {
+          const note = state.notes.find((n) => n.id === editBtn.dataset.editNote);
+          if (note) {
+            document.getElementById('editingNoteId').value = note.id;
+            document.getElementById('noteTitleInput').value = note.title;
+            document.getElementById('noteBodyInput').value = note.body;
+            document.getElementById('noteTagSelect').value = note.tag;
+            document.getElementById('noteFormTitle').textContent = 'Edit Note';
+            document.getElementById('saveNoteBtn').textContent = 'Update Note';
+            document.getElementById('cancelEditNoteBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+          return;
+        }
+        const delBtn = e.target.closest('[data-delete-note]');
+        if (delBtn) {
+          const id = delBtn.dataset.deleteNote;
+          showConfirmModal('Delete Note', 'Permanently delete this note from Second Brain?', 'Delete', () => {
+            state.notes = state.notes.filter((n) => n.id !== id);
+            if (document.getElementById('editingNoteId').value === id) resetNoteForm();
+            saveAndRefresh();
+            showToast('Note deleted', 'info');
+          });
+        }
+      });
+
+      /* -------- CREATIVE STUDIO -------- */
+      document.querySelectorAll('[data-studio-type]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          currentStudioType = btn.dataset.studioType;
+          document.querySelectorAll('[data-studio-type]').forEach((b) => b.classList.toggle('active', b === btn));
+          renderStudio();
+        });
+      });
+
+      document.getElementById('studioForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const prompt = document.getElementById('studioPromptInput').value.trim();
+        if (!prompt) {
+          showToast('Enter a prompt first', 'error');
+          return;
+        }
+        if (AIService.activeRequest) {
+          showToast('Generation already in progress', 'info');
+          return;
+        }
+
+        const tone = document.getElementById('studioToneSelect').value;
+        const length = document.getElementById('studioLengthSelect').value;
+        const btn = document.getElementById('studioGenerateBtn');
+        btn.disabled = true;
+        btn.textContent = 'Generating...';
+
+        const userPrompt = currentStudioType === 'story'
+          ? `Write a ${length}, ${tone} story based on this prompt:\n${prompt}`
+          : `Write a ${length}, ${tone} Instagram/YouTube Reel script based on this topic:\n${prompt}`;
+
+        const cfg = AIService.getActiveConfig(state.settings);
+        try {
+          const output = await AIService.generate({
+            provider: cfg.provider,
+            apiKey: cfg.apiKey,
+            model: cfg.model,
+            temperature: cfg.temperature,
+            systemInstruction: AIService.buildSystemInstruction(state.settings, currentStudioType),
+            messages: [{ role: 'user', content: userPrompt }]
+          });
+
+          currentStudioOutput = output;
+          document.getElementById('studioOutputTitle').textContent = currentStudioType === 'story' ? 'Generated Story' : 'Generated Reel Script';
+          document.getElementById('studioOutputBody').textContent = output;
+          document.getElementById('studioResultCard').classList.remove('hidden');
+
+          state.studio.history.unshift({
+            id: 'st_' + Date.now(),
+            type: currentStudioType,
+            prompt,
+            output,
+            ts: Date.now()
+          });
+          if (state.studio.history.length > 20) state.studio.history.length = 20;
+          awardExp(20, 'Creative Studio Generation');
+          logActivity(`Generated ${currentStudioType === 'story' ? 'Story' : 'Reel Script'}`, 'CREATIVE STUDIO');
+          saveAndRefresh();
+        } catch (err) {
+          showToast(AIService.formatError(err, cfg.providerLabel), 'error');
+        } finally {
+          btn.disabled = false;
+          renderStudio();
+        }
+      });
+
+      document.getElementById('studioCopyBtn').addEventListener('click', () => {
+        if (currentStudioOutput) copyText(currentStudioOutput);
+      });
+
+      document.getElementById('studioSaveNoteBtn').addEventListener('click', () => {
+        if (!currentStudioOutput) return;
+        const title = (currentStudioType === 'story' ? 'Story: ' : 'Reel Script: ') +
+          (document.getElementById('studioPromptInput').value.trim().slice(0, 45) || 'Untitled');
+        state.notes.unshift({
+          id: 'note_' + Date.now(),
+          title,
+          body: currentStudioOutput,
+          tag: 'Script',
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        });
+        logActivity(`Saved studio output to Second Brain`, 'CREATIVE STUDIO');
+        saveAndRefresh();
+        showToast('Saved to Second Brain', 'success');
+      });
+
+      document.getElementById('studioHistoryList').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-view-studio]');
+        if (!btn) return;
+        const item = state.studio.history.find((h) => h.id === btn.dataset.viewStudio);
+        if (item) {
+          currentStudioOutput = item.output;
+          document.getElementById('studioOutputTitle').textContent = item.type === 'story' ? 'Generated Story' : 'Generated Reel Script';
+          document.getElementById('studioOutputBody').textContent = item.output;
+          document.getElementById('studioResultCard').classList.remove('hidden');
+        }
+      });
+
+      /* -------- PHONE INTELLIGENCE (Focus Timer & Manual Logs) -------- */
+      function setTimerMinutes(mins) {
+        if (timerInterval) clearInterval(timerInterval);
+        timerRunning = false;
+        timerTotalSec = mins * 60;
+        timerRemainingSec = mins * 60;
+        document.getElementById('focusStartBtn').disabled = false;
+        document.getElementById('focusPauseBtn').disabled = true;
+        document.getElementById('focusFinishBtn').disabled = true;
+        document.getElementById('focusTimerDisplay').textContent = formatTimerMMSS(timerRemainingSec);
+      }
+
+      function completeFocusSession(minutesCompleted) {
+        if (timerInterval) clearInterval(timerInterval);
+        timerRunning = false;
+        if (minutesCompleted >= 1) {
+          state.phone.focusSessions.unshift({
+            id: 'fs_' + Date.now(),
+            date: getTodayKey(),
+            minutes: minutesCompleted,
+            ts: Date.now()
+          });
+          state.rpg.focusClearedTotal = (state.rpg.focusClearedTotal || 0) + 1;
+          awardExp(minutesCompleted, `${minutesCompleted}m Focus Session`);
+          logActivity(`Completed ${minutesCompleted}m Focus Session`, 'PHONE INTELLIGENCE');
+        }
+        setTimerMinutes(Math.round(timerTotalSec / 60));
+        saveAndRefresh();
+      }
+
+      function startFocusTimer() {
+        if (timerRunning) return;
+        if (timerInterval) clearInterval(timerInterval);
+        timerRunning = true;
+        document.getElementById('focusStartBtn').disabled = true;
+        document.getElementById('focusPauseBtn').disabled = false;
+        document.getElementById('focusFinishBtn').disabled = false;
+
+        timerInterval = setInterval(() => {
+          timerRemainingSec -= 1;
+          document.getElementById('focusTimerDisplay').textContent = formatTimerMMSS(Math.max(0, timerRemainingSec));
+          if (timerRemainingSec <= 0) {
+            completeFocusSession(Math.round(timerTotalSec / 60));
+          }
+        }, 1000);
+      }
+
+      document.querySelectorAll('.timer-preset').forEach((btn) => {
+        btn.addEventListener('click', () => setTimerMinutes(Number(btn.dataset.minutes) || 25));
+      });
+      document.getElementById('focusStartBtn').addEventListener('click', startFocusTimer);
+      document.getElementById('focusPauseBtn').addEventListener('click', () => {
+        if (timerInterval) clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('focusStartBtn').disabled = false;
+        document.getElementById('focusPauseBtn').disabled = true;
+      });
+      document.getElementById('focusResetBtn').addEventListener('click', () => {
+        setTimerMinutes(Math.round(timerTotalSec / 60));
+      });
+      document.getElementById('focusFinishBtn').addEventListener('click', () => {
+        const elapsedMin = Math.max(1, Math.round((timerTotalSec - timerRemainingSec) / 60));
+        completeFocusSession(elapsedMin);
+      });
+
+      document.getElementById('manualLogForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const app = document.getElementById('logAppInput').value.trim();
+        const category = document.getElementById('logCategorySelect').value;
+        const minutes = Number(document.getElementById('logMinutesInput').value);
+        if (!app || !minutes || minutes < 1) return;
+
+        state.phone.manualLogs.unshift({
+          id: 'ml_' + Date.now(),
+          date: getTodayKey(),
+          app,
+          category,
+          minutes,
+          ts: Date.now()
+        });
+        document.getElementById('logAppInput').value = '';
+        logActivity(`Logged ${minutes}m on ${app} (${category})`, 'PHONE INTELLIGENCE');
+        saveAndRefresh();
+        showToast('Activity logged', 'success');
+      });
+
+      document.getElementById('phoneLogList').addEventListener('click', (e) => {
+        const delBtn = e.target.closest('[data-delete-log]');
+        if (!delBtn) return;
+        const id = delBtn.dataset.deleteLog;
+        showConfirmModal('Delete Log Entry', 'Remove this manually logged activity?', 'Delete', () => {
+          state.phone.manualLogs = state.phone.manualLogs.filter((l) => l.id !== id);
+          saveAndRefresh();
+        });
+      });
+
+      /* -------- SETTINGS & DATA MANAGEMENT -------- */
+      document.getElementById('apiTempInput').addEventListener('input', (e) => {
+        document.getElementById('apiTempVal').textContent = e.target.value;
+        state.settings.temperature = Number(e.target.value);
+        StorageService.save(state);
+      });
+
+      document.getElementById('voiceRateInput').addEventListener('input', (e) => {
+        document.getElementById('voiceRateVal').textContent = e.target.value;
+      });
+
+      document.getElementById('voiceVolumeInput').addEventListener('input', (e) => {
+        document.getElementById('voiceVolumeVal').textContent = String(Math.round(Number(e.target.value) * 100));
+      });
+
+      document.getElementById('testVoiceBtn').addEventListener('click', () => {
+        const statusEl = document.getElementById('voiceTestStatus');
+        if (VoiceService.isSpeaking) {
+          VoiceService.stopSpeaking();
+          setOrbState('idle');
+          statusEl.classList.remove('hidden');
+          statusEl.style.color = 'var(--text-secondary)';
+          statusEl.textContent = 'Voice test stopped.';
+          return;
+        }
+        const voicesCount = VoiceService.getVoices().length;
+        statusEl.classList.remove('hidden');
+        statusEl.style.color = 'var(--text-secondary)';
+        statusEl.textContent = `Testing default browser voice (voices loaded: ${voicesCount})...`;
+
+        VoiceService.speak('Hello, I am FRIDAY.', {
+          useDefaultVoice: true,
+          rate: 1,
+          pitch: 1,
+          volume: 1,
+          onStart: () => {
+            setOrbState('speaking');
+            statusEl.style.color = 'var(--accent-emerald)';
+            statusEl.textContent = `Speaking with default browser voice (voices loaded: ${voicesCount}).`;
+          },
+          onEnd: () => {
+            setOrbState('idle');
+          },
+          onError: (msg) => {
+            statusEl.style.color = 'var(--accent-rose)';
+            statusEl.textContent = msg;
+            showToast(msg, 'error');
+          }
+        });
+      });
+
+      function readSingleProviderIntoState(pid) {
+        const cleanKey = AIService.normalizeApiKey(document.getElementById(`key_${pid}`).value);
+        const model = document.getElementById(`model_${pid}`).value;
+        const customModel = document.getElementById(`custom_model_${pid}`).value.trim();
+        const prev = state.settings.providers[pid] || {};
+        if (prev.apiKey !== cleanKey || prev.model !== model || prev.customModel !== customModel) {
+          AIService.connectionStatus[pid] = 'untested';
+          AIService.testMessages[pid] = '';
+        }
+        state.settings.providers[pid] = { apiKey: cleanKey, model, customModel };
+        state.settings.temperature = Number(document.getElementById('apiTempInput').value);
+      }
+
+      document.getElementById('apiProviderSelect').addEventListener('change', (e) => {
+        state.settings.provider = e.target.value;
+        saveAndRefresh();
+        showToast(`Active provider switched to ${PROVIDER_CATALOG[e.target.value].label}`, 'info');
+      });
+
+      document.getElementById('providerCardsContainer').addEventListener('change', (e) => {
+        const modelSel = e.target.closest('[data-provider-model]');
+        if (modelSel) {
+          const pid = modelSel.dataset.providerModel;
+          document.getElementById(`custom_group_${pid}`).classList.toggle('hidden', modelSel.value !== 'custom');
+          AIService.connectionStatus[pid] = 'untested';
+          AIService.testMessages[pid] = '';
+          readSingleProviderIntoState(pid);
+          StorageService.save(state);
+          renderHeaderAndTheme();
+          renderDashboard();
+        }
+      });
+
+      document.getElementById('providerCardsContainer').addEventListener('click', async (e) => {
+        const visBtn = e.target.closest('[data-toggle-vis]');
+        if (visBtn) {
+          const pid = visBtn.dataset.toggleVis;
+          const inp = document.getElementById(`key_${pid}`);
+          const isPwd = inp.type === 'password';
+          inp.type = isPwd ? 'text' : 'password';
+          visBtn.textContent = isPwd ? 'Hide' : 'Show';
+          return;
+        }
+
+        const saveBtn = e.target.closest('[data-save-provider]');
+        if (saveBtn) {
+          const pid = saveBtn.dataset.saveProvider;
+          readSingleProviderIntoState(pid);
+          state.settings.provider = pid;
+          saveAndRefresh();
+          showToast(`${PROVIDER_CATALOG[pid].label} set as active provider & saved`, 'success');
+          return;
+        }
+
+        const clearBtn = e.target.closest('[data-clear-provider]');
+        if (clearBtn) {
+          const pid = clearBtn.dataset.clearProvider;
+          const label = PROVIDER_CATALOG[pid].label;
+          showConfirmModal('Remove API Key', `Remove your saved ${label} API key from this browser?`, 'Remove', () => {
+            state.settings.providers[pid].apiKey = '';
+            AIService.connectionStatus[pid] = 'untested';
+            AIService.testMessages[pid] = '';
+            saveAndRefresh();
+            showToast(`${label} API key removed`, 'info');
+          });
+          return;
+        }
+
+        const testBtn = e.target.closest('[data-test-provider]');
+        if (testBtn) {
+          if (AIService.activeRequest) {
+            showToast('A request is already in progress', 'info');
+            return;
+          }
+          const pid = testBtn.dataset.testProvider;
+          readSingleProviderIntoState(pid);
+          state.settings.provider = pid;
+          const cfg = AIService.getProviderConfig(state.settings, pid);
+
+          AIService.connectionStatus[pid] = 'testing';
+          AIService.testMessages[pid] = `Testing connection to ${cfg.providerLabel}...`;
+          renderAll();
+
+          try {
+            const text = await AIService.generate({
+              provider: pid,
+              apiKey: cfg.apiKey,
+              model: cfg.model,
+              temperature: undefined,
+              systemInstruction: '',
+              messages: [{ role: 'user', content: 'Hello' }]
+            });
+            AIService.testMessages[pid] = `Connected (${cfg.model}): ${text}`;
+            StorageService.save(state);
+            renderAll();
+            showToast(`${cfg.providerLabel} connected`, 'success');
+          } catch (err) {
+            AIService.testMessages[pid] = AIService.formatError(err, cfg.providerLabel);
+            StorageService.save(state);
+            renderAll();
+          }
+        }
+      });
+
+      document.getElementById('savePrefsBtn').addEventListener('click', () => {
+        state.settings.userName = document.getElementById('userNameInput').value.trim() || 'Operator';
+        state.settings.theme = document.getElementById('themeSelect').value;
+        state.settings.language = document.getElementById('languageSelect').value;
+        state.settings.voiceURI = document.getElementById('voiceSelect').value;
+        state.settings.voiceRate = Number(document.getElementById('voiceRateInput').value);
+        state.settings.voiceVolume = Number(document.getElementById('voiceVolumeInput').value);
+        state.settings.autoSpeak = document.getElementById('autoSpeakCheck').checked;
+        saveAndRefresh();
+        showToast('Preferences saved', 'success');
+      });
+
+      document.getElementById('exportDataBtn').addEventListener('click', () => {
+        try {
+          const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `nexus-backup-${getTodayKey()}.json`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          showToast('Backup exported', 'success');
+        } catch {
+          showToast('Export failed', 'error');
+        }
+      });
+
+      document.getElementById('importDataInput').addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(String(reader.result));
+            if (!parsed || typeof parsed !== 'object' || !parsed.settings || !parsed.rpg) {
+              throw new Error('Invalid NEXUS backup format');
+            }
+            showConfirmModal('Import Backup', 'Replace current local NEXUS data with this backup file?', 'Import', () => {
+              state = parsed;
+              StorageService.save(state);
+              state = StorageService.load();
+              renderAll();
+              showToast('Backup imported successfully', 'success');
+            });
+          } catch (err) {
+            showToast(`Import failed: ${err.message}`, 'error');
+          } finally {
+            e.target.value = '';
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      document.getElementById('resetAllDataBtn').addEventListener('click', () => {
+        showConfirmModal('Reset All Data', 'This will permanently erase all notes, chats, RPG progress, and API settings in this browser.', 'Erase Everything', () => {
+          state = createDefaultState();
+          StorageService.save(state);
+          renderAll();
+          showToast('All local data reset', 'info');
+        });
+      });
+
+      /* ---------------- Init ---------------- */
+      if (VoiceService.hasSynthesis && window.speechSynthesis.addEventListener) {
+        window.speechSynthesis.addEventListener('voiceschanged', populateVoices);
+      } else if (VoiceService.hasSynthesis) {
+        window.speechSynthesis.onvoiceschanged = populateVoices;
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
