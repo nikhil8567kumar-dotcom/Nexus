@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>NEXUS - Personal Intelligence System</title>
+  <title>NEXUS - Personal Intelligence System & Creator Studio 2.0</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -60,6 +60,10 @@
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Parsing & Export Libraries: PDF.js + JSZip (DOCX) + jsPDF + html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Inter Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
 
@@ -71,8 +75,7 @@
       -webkit-tap-highlight-color: transparent;
       overflow-x: hidden;
     }
-    
-    /* Glassmorphic elements */
+
     .glass-card {
       background: rgba(18, 18, 32, 0.75);
       backdrop-filter: blur(12px);
@@ -85,8 +88,7 @@
       -webkit-backdrop-filter: blur(16px);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-    
-    /* Scrollbar Styling */
+
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -102,7 +104,6 @@
       background: rgba(99, 102, 241, 0.6);
     }
 
-    /* Animated CSS Orb */
     .friday-orb {
       width: 140px;
       height: 140px;
@@ -111,7 +112,6 @@
       transition: all 0.4s ease;
     }
 
-    /* Active Nav Highlight */
     .nav-btn.active {
       color: #00f0ff;
       text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
@@ -133,12 +133,24 @@
         <h1 class="text-base font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-300 to-purple-400">
           NEXUS
         </h1>
-        <p class="text-[10px] text-gray-400 font-medium tracking-tight">Personal Intelligence v3.0</p>
+        <p class="text-[10px] text-gray-400 font-medium tracking-tight">Personal Intelligence v5.0 • Creator Studio 2.0 & All Modules</p>
       </div>
     </div>
 
     <!-- Right Control Options -->
     <div class="flex items-center gap-2">
+      <!-- Memory Core Pill -->
+      <button onclick="openMemoryModal()" title="Persistent Memory Core" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/10 border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 transition">
+        <i class="fa-solid fa-database text-[10px] text-cyber-blue"></i>
+        <span id="memoryCountPill">0 Mem</span>
+      </button>
+
+      <!-- Symbol & Emoji Glossary Button -->
+      <button onclick="openGlossaryModal()" title="Symbols & Emoji Glossary" class="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 transition">
+        <i class="fa-solid fa-book-open text-[10px]"></i>
+        <span class="hidden sm:inline">Glossary</span>
+      </button>
+
       <!-- API Status Pill -->
       <button id="apiStatusPill" onclick="openSettingsModal()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -146,72 +158,98 @@
       </button>
 
       <!-- Settings Icon -->
-      <button onclick="openSettingsModal()" class="w-9 h-9 rounded-xl glass-card flex items-center justify-center text-gray-300 hover:text-white hover:border-brand-500/50 transition">
+      <button onclick="openSettingsModal()" title="Settings & Data Backup" class="w-9 h-9 rounded-xl glass-card flex items-center justify-center text-gray-300 hover:text-white hover:border-brand-500/50 transition">
         <i class="fa-solid fa-sliders text-sm"></i>
       </button>
     </div>
   </header>
+
+  <!-- GLOBAL REMINDER ALERT TOAST -->
+  <div id="reminderAlertBar" class="hidden fixed top-16 left-4 right-4 z-50 max-w-xl mx-auto glass-card rounded-2xl p-4 border border-amber-400/50 bg-amber-950/80 shadow-2xl flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center flex-shrink-0">
+        <i class="fa-solid fa-bell animate-bounce"></i>
+      </div>
+      <div>
+        <p class="text-[11px] font-bold uppercase tracking-wider text-amber-300">Reminder Due</p>
+        <p id="reminderAlertTitle" class="text-xs font-semibold text-white"></p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="button" onclick="completeActiveAlertReminder()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition">
+        Done
+      </button>
+      <button type="button" onclick="dismissReminderAlert()" class="px-2.5 py-1.5 rounded-lg glass-card text-gray-300 hover:text-white text-[11px]">
+        Dismiss
+      </button>
+    </div>
+  </div>
 
   <!-- MAIN CONTAINER (VIEW PANELS) -->
   <main class="flex-1 max-w-5xl w-full mx-auto p-4 mb-20">
 
     <!-- VIEW 1: HOME DASHBOARD -->
     <section id="view-home" class="view-panel space-y-6">
-      <!-- Hero Welcome Card -->
       <div class="glass-card rounded-2xl p-6 relative overflow-hidden border border-brand-500/20">
         <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-brand-600/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="relative z-10 space-y-2">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-medium">
-            <i class="fa-solid fa-sparkles text-cyan-400"></i> Online & Ready
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-medium">
+              <i class="fa-solid fa-sparkles text-cyan-400"></i> Creator Studio 2.0 Enabled • <span id="dashTodayDate">Today</span>
+            </div>
+            <h2 class="text-2xl font-bold text-white tracking-tight">Welcome back, Architect</h2>
+            <p class="text-xs text-gray-400 max-w-lg">
+              FRIDAY Action Core & Creator Studio 2.0 are online. Manage tasks, scripts, reminders, notes, and workflows locally or by voice.
+            </p>
           </div>
-          <h2 class="text-2xl font-bold text-white tracking-tight">Welcome back, Architect</h2>
-          <p class="text-sm text-gray-400 max-w-lg">
-            Your intelligence core is active. FRIDAY is standby for voice commands, life RPG tracking is active, and notes vault is synchronized.
-          </p>
+          <div class="flex items-center gap-2">
+            <button onclick="switchTab('studio')" class="px-3.5 py-2 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-200 hover:bg-purple-600/40 text-xs font-semibold transition">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>Creator Studio
+            </button>
+            <button onclick="switchTab('friday')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-cyber-blue text-white text-xs font-semibold hover:opacity-90 transition">
+              <i class="fa-solid fa-microphone mr-1.5"></i>FRIDAY
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Quick Metrics Grid -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <!-- Level Stat -->
         <div class="glass-card p-4 rounded-xl flex items-center justify-between border-l-4 border-cyber-blue">
           <div>
-            <p class="text-xs text-gray-400 uppercase font-semibold">RPG Level</p>
-
-            <h3 id="dashLevel" class="text-xl font-black text-white">Lvl 1</h3>
+            <p class="text-xs text-gray-400 uppercase font-semibold">Daily Progress</p>
+            <h3 id="dashDailyProgress" class="text-xl font-black text-white">0%</h3>
+            <p id="dashLevelSub" class="text-[10px] text-cyber-blue font-semibold">Lvl 1 • 0 XP</p>
           </div>
           <div class="w-10 h-10 rounded-lg bg-cyber-blue/10 flex items-center justify-center text-cyber-blue">
-            <i class="fa-solid fa-shield-halved text-lg"></i>
+            <i class="fa-solid fa-chart-pie text-lg"></i>
           </div>
         </div>
-        <!-- EXP Stat -->
         <div class="glass-card p-4 rounded-xl flex items-center justify-between border-l-4 border-purple-500">
           <div>
-            <p class="text-xs text-gray-400 uppercase font-semibold">Total EXP</p>
-
-            <h3 id="dashExp" class="text-xl font-black text-white">0 XP</h3>
+            <p class="text-xs text-gray-400 uppercase font-semibold">Saved Scripts</p>
+            <h3 id="dashScriptsCount" class="text-xl font-black text-white">0</h3>
+            <p id="dashCollectionsSub" class="text-[10px] text-purple-300 font-semibold">0 Collections</p>
           </div>
           <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
-            <i class="fa-solid fa-bolt text-lg"></i>
+            <i class="fa-solid fa-file-pen text-lg"></i>
           </div>
         </div>
-        <!-- Brain Notes Stat -->
         <div class="glass-card p-4 rounded-xl flex items-center justify-between border-l-4 border-emerald-500">
           <div>
             <p class="text-xs text-gray-400 uppercase font-semibold">Vault Notes</p>
-
             <h3 id="dashNotesCount" class="text-xl font-black text-white">0</h3>
+            <p id="dashPinnedCount" class="text-[10px] text-emerald-300 font-semibold">0 Pinned</p>
           </div>
           <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
             <i class="fa-solid fa-brain text-lg"></i>
           </div>
         </div>
-        <!-- Focus Time Stat -->
         <div class="glass-card p-4 rounded-xl flex items-center justify-between border-l-4 border-cyber-pink">
           <div>
-            <p class="text-xs text-gray-400 uppercase font-semibold">Focus Minutes</p>
-
+            <p class="text-xs text-gray-400 uppercase font-semibold">Focus Today</p>
             <h3 id="dashFocusMins" class="text-xl font-black text-white">0m</h3>
+            <p id="dashTotalFocusSub" class="text-[10px] text-pink-300 font-semibold">0m Total</p>
           </div>
           <div class="w-10 h-10 rounded-lg bg-cyber-pink/10 flex items-center justify-center text-cyber-pink">
             <i class="fa-solid fa-stopwatch text-lg"></i>
@@ -222,6 +260,19 @@
       <!-- Quick Action Modules -->
       <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Quick Modules</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button onclick="switchTab('studio')" class="glass-card p-5 rounded-2xl text-left hover:border-purple-500/50 transition group flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-600 flex items-center justify-center text-white text-xl shadow-lg shadow-purple-500/20 group-hover:scale-105 transition">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <i class="fa-solid fa-arrow-right text-gray-500 group-hover:text-purple-400 transition"></i>
+          </div>
+          <div class="mt-4">
+            <h4 class="font-bold text-white text-base">Creator Studio 2.0</h4>
+            <p class="text-xs text-gray-400">AI script generation, bulk series, collections, PDF/DOCX export & voice preview.</p>
+          </div>
+        </button>
+
         <button onclick="switchTab('friday')" class="glass-card p-5 rounded-2xl text-left hover:border-cyber-blue/50 transition group flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-xl shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition">
@@ -231,78 +282,91 @@
           </div>
           <div class="mt-4">
             <h4 class="font-bold text-white text-base">Speak with FRIDAY</h4>
-            <p class="text-xs text-gray-400">Voice-controlled assistant with automated speech response.</p>
+            <p class="text-xs text-gray-400">Control tasks, reminders, scripts, and document workflows by natural language.</p>
           </div>
         </button>
 
-        <button onclick="switchTab('rpg')" class="glass-card p-5 rounded-2xl text-left hover:border-purple-500/50 transition group flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-600 flex items-center justify-center text-white text-xl shadow-lg shadow-purple-500/20 group-hover:scale-105 transition">
-              <i class="fa-solid fa-gamepad"></i>
-            </div>
-            <i class="fa-solid fa-arrow-right text-gray-500 group-hover:text-purple-400 transition"></i>
-          </div>
-          <div class="mt-4">
-            <h4 class="font-bold text-white text-base">Life RPG Hub</h4>
-            <p class="text-xs text-gray-400">Complete quests, earn EXP, level up your real life stats.</p>
-          </div>
-        </button>
-
-        <button onclick="switchTab('studio')" class="glass-card p-5 rounded-2xl text-left hover:border-emerald-500/50 transition group flex flex-col justify-between">
+        <button onclick="switchTab('planner')" class="glass-card p-5 rounded-2xl text-left hover:border-emerald-500/50 transition group flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xl shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition">
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <i class="fa-solid fa-calendar-check"></i>
             </div>
             <i class="fa-solid fa-arrow-right text-gray-500 group-hover:text-emerald-400 transition"></i>
           </div>
           <div class="mt-4">
-            <h4 class="font-bold text-white text-base">Creative Studio</h4>
-            <p class="text-xs text-gray-400">Generate stories, video scripts, & creative outlines automatically.</p>
+            <h4 class="font-bold text-white text-base">Daily Planner & Focus</h4>
+            <p class="text-xs text-gray-400">Top 3 priorities, AI morning plan approval, and Pomodoro timer.</p>
           </div>
         </button>
       </div>
     </section>
 
-    <!-- VIEW 2: FRIDAY AI VOICE ASSISTANT -->
+    <!-- VIEW 2: FRIDAY AI VOICE & ACTION ASSISTANT -->
     <section id="view-friday" class="view-panel hidden space-y-6">
       <div class="glass-card rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-4 border border-brand-500/30">
-        
-        <!-- Animated FRIDAY Orb -->
         <div id="fridayOrb" class="friday-orb animate-orb-pulse my-4 shadow-2xl flex items-center justify-center relative cursor-pointer" onclick="toggleVoiceInput()">
           <i id="orbIcon" class="fa-solid fa-microphone text-white text-2xl drop-shadow-md"></i>
         </div>
-
         <div>
           <h2 id="orbStatus" class="text-xl font-black text-white tracking-wide">FRIDAY Idle</h2>
-          <p id="orbSubtext" class="text-xs text-gray-400 mt-1">Tap the orb or use the chat bar below to interact.</p>
+          <p id="orbSubtext" class="text-xs text-gray-400 mt-1">Try: "Generate 10 scripts about heartbreaks", "Export my saved scripts into a PDF", "Remind me to read at 9 PM"</p>
         </div>
-
-        <!-- Mode Indicator -->
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-400">Auto Speak Response:</span>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="toggleAutoSpeak" class="sr-only peer" checked>
-            <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyber-blue"></div>
-          </label>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-400">Auto Speak:</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="toggleAutoSpeak" onchange="if(!this.checked) VoiceService.stopAll()" class="sr-only peer" checked>
+              <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyber-blue"></div>
+            </label>
+          </div>
+          <select id="conversationSelect" onchange="switchConversation(this.value)" class="glass-card px-2.5 py-1 rounded-lg bg-gray-900/70 text-[11px] text-gray-200 focus:outline-none focus:border-cyber-blue max-w-[160px]">
+            <option value="">Active Thread</option>
+          </select>
+          <button type="button" onclick="createNewConversation()" class="px-2.5 py-1 rounded-lg bg-cyber-blue/15 border border-cyber-blue/30 text-cyber-blue hover:bg-cyber-blue/25 text-[11px] font-semibold transition">
+            <i class="fa-solid fa-plus mr-1"></i>New Chat
+          </button>
         </div>
       </div>
 
-      <!-- Chat History Stream -->
+      <div id="sensitiveConfirmBanner" class="hidden glass-card rounded-2xl p-4 border border-amber-500/40 bg-amber-950/20 space-y-2.5">
+        <div class="flex items-start gap-2.5">
+          <i class="fa-solid fa-shield-halved text-amber-400 text-sm mt-0.5"></i>
+          <div class="flex-1">
+            <p class="text-xs font-bold text-amber-300">Sensitive Personal Detail Detected</p>
+            <p id="sensitiveConfirmText" class="text-[11px] text-gray-300 mt-0.5 leading-relaxed"></p>
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-2">
+          <button type="button" onclick="resolvePendingSensitive(false)" class="px-3 py-1.5 rounded-lg glass-card text-[11px] text-gray-300 hover:text-white transition">Ignore</button>
+          <button type="button" onclick="resolvePendingSensitive(true)" class="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-200 hover:bg-amber-500/30 text-[11px] font-semibold transition">Save Locally</button>
+        </div>
+      </div>
+
+      <div id="destructiveConfirmBanner" class="hidden glass-card rounded-2xl p-4 border border-red-500/40 bg-red-950/25 space-y-2.5">
+        <div class="flex items-start gap-2.5">
+          <i class="fa-solid fa-triangle-exclamation text-red-400 text-sm mt-0.5"></i>
+          <div class="flex-1">
+            <p class="text-xs font-bold text-red-300">Confirm Destructive Action</p>
+            <p id="destructiveConfirmText" class="text-[11px] text-gray-300 mt-0.5 leading-relaxed"></p>
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-2">
+          <button type="button" onclick="resolvePendingDestructive(false)" class="px-3 py-1.5 rounded-lg glass-card text-[11px] text-gray-300 hover:text-white transition">Cancel</button>
+          <button type="button" onclick="resolvePendingDestructive(true)" class="px-3 py-1.5 rounded-lg bg-red-600/30 border border-red-500/50 text-red-200 hover:bg-red-600/40 text-[11px] font-semibold transition">Confirm Delete</button>
+        </div>
+      </div>
+
       <div id="chatStream" class="glass-card rounded-2xl p-4 h-80 overflow-y-auto space-y-4">
-        <!-- Assistant Intro Message -->
         <div class="flex items-start gap-3">
-          <div class="w-8 h-8 rounded-lg bg-cyber-blue/20 text-cyber-blue flex items-center justify-center text-sm font-bold flex-shrink-0">
-            F
-          </div>
+          <div class="w-8 h-8 rounded-lg bg-cyber-blue/20 text-cyber-blue flex items-center justify-center text-sm font-bold flex-shrink-0">F</div>
           <div class="bg-gray-800/80 rounded-2xl rounded-tl-none p-3.5 max-w-[85%] text-xs text-gray-200 leading-relaxed border border-white/5">
-            Greetings! I am FRIDAY. Ask me anything, or instruct me to log RPG quests and notes for you.
+            Greetings! I am FRIDAY. Give me creator commands like "Generate 10 relationship scripts", "Export my saved library to PDF", or "Remind me to study at 9 PM".
           </div>
         </div>
       </div>
 
-      <!-- Chat Input Form -->
       <form id="chatForm" class="flex gap-2">
-        <input type="text" id="chatInput" placeholder="Ask FRIDAY or give a command..." class="flex-1 glass-card px-4 py-3.5 rounded-xl bg-gray-900/60 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyber-blue/50 transition">
+        <input type="text" id="chatInput" placeholder="Ask FRIDAY or give a creator command..." class="flex-1 glass-card px-4 py-3.5 rounded-xl bg-gray-900/60 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyber-blue/50 transition">
         <button type="button" id="micBtn" onclick="toggleVoiceInput()" class="w-12 h-12 rounded-xl glass-card flex items-center justify-center text-cyan-400 hover:bg-cyan-500/10 border border-cyan-500/30 transition">
           <i class="fa-solid fa-microphone text-base"></i>
         </button>
@@ -312,794 +376,779 @@
       </form>
     </section>
 
-    <!-- VIEW 3: LIFE RPG HUB -->
-    <section id="view-rpg" class="view-panel hidden space-y-6">
-      <!-- Player Level Card -->
-      <div class="glass-card rounded-2xl p-6 border border-purple-500/30 space-y-4">
+    <!-- VIEW 3: TASKS, HABITS & PMO -->
+    <section id="view-tasks" class="view-panel hidden space-y-6">
+      <div id="hunterRankHeroCard" class="glass-card rounded-2xl p-5 border border-purple-500/30 space-y-3">
         <div class="flex items-center justify-between">
-          <div>
-            <span class="text-xs font-semibold text-purple-400 uppercase tracking-widest">Player Status</span>
-            <h2 id="rpgLevelText" class="text-2xl font-black text-white">Level 1 Novice</h2>
+          <div class="flex items-center gap-3">
+            <div id="rpgRankBadge" class="w-12 h-12 rounded-xl bg-gray-800/90 border border-white/15 flex items-center justify-center text-2xl font-black text-gray-300">E</div>
+            <div>
+              <span class="text-[10px] font-semibold text-purple-400 uppercase tracking-widest">Hunter Rank & Discipline System</span>
+              <h2 id="rpgLevelText" class="text-xl font-black text-white">E · Iron Hunter</h2>
+            </div>
           </div>
           <div class="text-right">
-            <span id="rpgExpText" class="text-sm font-bold text-cyber-blue">0 / 100 EXP</span>
+            <span id="rpgExpText" class="text-xs font-bold text-cyber-blue">0 / 2,000 EXP</span>
+            <p id="rpgNextRankText" class="text-[10px] text-gray-400">Next: Bronze Hunter (D)</p>
           </div>
         </div>
-
-        <!-- EXP Progress Bar -->
-        <div class="w-full bg-gray-800 rounded-full h-4 overflow-hidden border border-white/10 p-0.5">
+        <div class="w-full bg-gray-800 rounded-full h-3 overflow-hidden border border-white/10 p-0.5">
           <div id="rpgProgressBar" class="bg-gradient-to-r from-purple-500 via-indigo-500 to-cyber-blue h-full rounded-full transition-all duration-500" style="width: 0%"></div>
         </div>
       </div>
 
-      <!-- Quest Creation & List -->
-      <div class="grid md:grid-cols-3 gap-6">
-        <!-- Add Quest Form -->
-        <div class="glass-card rounded-2xl p-5 space-y-4 md:col-span-1 border border-white/10">
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-plus-circle text-purple-400"></i> New Quest
-          </h3>
-          <form id="questForm" class="space-y-3">
-            <div>
-              <label class="text-xs text-gray-400 block mb-1">Quest Title</label>
-              <input type="text" id="questTitle" required placeholder="e.g., Read 20 pages" class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-purple-500">
-            </div>
-            <div>
-              <label class="text-xs text-gray-400 block mb-1">EXP Reward</label>
-              <select id="questExp" class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-purple-500">
-                <option value="25">+25 EXP (Easy Task)</option>
-                <option value="50">+50 EXP (Medium Task)</option>
-                <option value="100">+100 EXP (Hard Task)</option>
-              </select>
-            </div>
-            <button type="submit" class="w-full py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs transition">
-              Add Quest
-            </button>
-          </form>
-        </div>
-
-        <!-- Active Quests List -->
-        <div class="glass-card rounded-2xl p-5 md:col-span-2 space-y-4 border border-white/10">
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-scroll text-cyber-blue"></i> Daily Quests
-          </h3>
-          <div id="questList" class="space-y-2 max-h-72 overflow-y-auto pr-1">
-            <!-- Quests render dynamically -->
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEW 4: SECOND BRAIN NOTES VAULT -->
-    <section id="view-brain" class="view-panel hidden space-y-6">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-brain text-emerald-400"></i> Second Brain Vault
-        </h2>
-        <button onclick="openNoteModal()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-plus"></i> New Note
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" id="subtab-habits-btn" onclick="switchTaskSubTab('habits')" class="px-3.5 py-2 rounded-xl bg-emerald-600/30 border border-emerald-500/50 text-white text-xs font-semibold transition">
+          <i class="fa-solid fa-repeat mr-1.5 text-emerald-400"></i>Permanent Habits (<span id="habitsBadgeProgress">0/7</span>)
+        </button>
+        <button type="button" id="subtab-tasks-btn" onclick="switchTaskSubTab('tasks')" class="px-3.5 py-2 rounded-xl glass-card text-gray-300 hover:text-white text-xs font-semibold transition">
+          <i class="fa-solid fa-list-check mr-1.5 text-cyber-blue"></i>Daily Tasks
+        </button>
+        <button type="button" id="subtab-pmo-btn" onclick="switchTaskSubTab('pmo')" class="px-3.5 py-2 rounded-xl glass-card text-gray-300 hover:text-white text-xs font-semibold transition">
+          <i class="fa-solid fa-shield-halved mr-1.5 text-purple-400"></i>PMO System (<span id="pmoStreakPill">0d</span>)
+        </button>
+        <button type="button" id="subtab-reminders-btn" onclick="switchTaskSubTab('reminders')" class="px-3.5 py-2 rounded-xl glass-card text-gray-300 hover:text-white text-xs font-semibold transition">
+          <i class="fa-solid fa-bell mr-1.5 text-amber-400"></i>Reminders (<span id="reminderBadgeCount">0</span>)
         </button>
       </div>
 
-      <!-- Notes Grid -->
-      <div id="notesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Dynamic notes -->
-      </div>
-    </section>
-
-    <!-- VIEW 5: CREATIVE STUDIO -->
-    <section id="view-studio" class="view-panel hidden space-y-6">
-      <div class="glass-card rounded-2xl p-6 border border-emerald-500/30 space-y-4">
-        <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> AI Creative Generator
-          </h2>
-          <p class="text-xs text-gray-400 mt-1">Generate video scripts, blog outlines, or short stories using your active LLM key.</p>
+      <div id="subpanel-habits" class="space-y-5">
+        <div class="glass-card rounded-2xl p-5 border border-emerald-500/30 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-semibold text-emerald-400 uppercase tracking-widest">Permanent Daily Habits • Resets at Midnight</span>
+              <h3 class="text-base font-bold text-white">Today's Habit Execution</h3>
+            </div>
+            <div class="text-right">
+              <span id="habitsProgressPctText" class="text-lg font-black text-emerald-400">0%</span>
+              <p id="habitsProgressCountText" class="text-[11px] text-gray-400">0 of 7 completed</p>
+            </div>
+          </div>
+          <div class="w-full bg-gray-800 rounded-full h-3 overflow-hidden border border-white/10 p-0.5">
+            <div id="habitsProgressBar" class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
         </div>
 
-        <div class="space-y-3">
-          <div>
-            <label class="text-xs text-gray-400 block mb-1">Content Type</label>
-            <select id="studioType" class="w-full glass-card p-3 rounded-xl bg-gray-900/60 text-xs text-white focus:outline-none focus:border-emerald-500">
-              <option value="Reel / Short Script">Short Video / Reel Script (30s)</option>
-              <option value="Blog Outline">Comprehensive Blog Post Outline</option>
-              <option value="Creative Story">Sci-Fi / Creative Story Idea</option>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="glass-card rounded-2xl p-5 space-y-3 md:col-span-1 border border-white/10 h-fit">
+            <h3 id="habitFormHeading" class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-plus-circle text-emerald-400"></i> Add Permanent Habit
+            </h3>
+            <form id="habitForm" class="space-y-3">
+              <input type="hidden" id="editHabitId" value="">
+              <input type="text" id="habitTitleInput" required placeholder="Habit name..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white">
+              <input type="number" id="habitExpInput" min="10" max="500" value="100" required class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white">
+              <button type="submit" id="habitSubmitBtn" class="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs">Save Permanent Habit</button>
+            </form>
+          </div>
+          <div class="glass-card rounded-2xl p-5 md:col-span-2 space-y-4 border border-white/10">
+            <h3 class="text-sm font-bold text-white">Active Daily Habits</h3>
+            <div id="permanentHabitsList" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="subpanel-tasks" class="hidden grid md:grid-cols-3 gap-6">
+        <div class="glass-card rounded-2xl p-5 space-y-3 md:col-span-1 border border-white/10 h-fit">
+          <h3 id="taskFormHeading" class="text-sm font-bold text-white">New Daily Task</h3>
+          <form id="taskForm" class="space-y-3">
+            <input type="hidden" id="editTaskId" value="">
+            <input type="text" id="taskTitleInput" required placeholder="Task title..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white">
+            <textarea id="taskDescInput" rows="2" placeholder="Description..." class="w-full glass-card p-2 rounded-lg bg-gray-900/60 text-xs text-white"></textarea>
+            <select id="taskPriorityInput" class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white">
+              <option value="Urgent">Urgent (+150 XP)</option>
+              <option value="High">High (+100 XP)</option>
+              <option value="Medium" selected>Medium (+50 XP)</option>
+              <option value="Low">Low (+25 XP)</option>
             </select>
-          </div>
-          <div>
-            <label class="text-xs text-gray-400 block mb-1">Prompt / Topic</label>
-            <textarea id="studioPrompt" rows="3" placeholder="Enter topic details (e.g. 5 Productivity Tips for Programmers)..." class="w-full glass-card p-3 rounded-xl bg-gray-900/60 text-xs text-white focus:outline-none focus:border-emerald-500"></textarea>
-          </div>
-          <button onclick="generateCreativeContent()" id="studioGenerateBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-bold text-xs hover:opacity-90 transition">
-            Generate Content
-          </button>
-        </div>
-      </div>
-
-      <!-- Generated Result Output -->
-      <div id="studioOutputBox" class="glass-card rounded-2xl p-6 hidden space-y-3 border border-white/10">
-        <div class="flex items-center justify-between">
-          <h3 class="text-sm font-bold text-emerald-400">Generated Output</h3>
-          <button onclick="copyStudioOutput()" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
-            <i class="fa-solid fa-copy"></i> Copy
-          </button>
-        </div>
-        <div id="studioOutputText" class="text-xs text-gray-200 leading-relaxed whitespace-pre-wrap bg-gray-950/50 p-4 rounded-xl border border-white/5 max-h-80 overflow-y-auto"></div>
-      </div>
-    </section>
-
-    <!-- VIEW 6: PHONE INTELLIGENCE -->
-    <section id="view-phone" class="view-panel hidden space-y-6">
-      <div class="grid md:grid-cols-2 gap-6">
-        <!-- Focus Pomodoro Timer -->
-        <div class="glass-card rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-4 border border-cyber-pink/30">
-          <span class="text-xs font-semibold text-cyber-pink uppercase tracking-widest">Focus Session</span>
-          <div id="timerDisplay" class="text-5xl font-black text-white font-mono tracking-wider">
-            25:00
-          </div>
-          <div class="flex items-center gap-3">
-            <button id="timerToggleBtn" onclick="toggleFocusTimer()" class="px-6 py-2.5 rounded-xl bg-cyber-pink text-white font-bold text-xs hover:opacity-90 shadow-lg shadow-cyber-pink/20 transition">
-              Start Focus
-            </button>
-            <button onclick="resetFocusTimer()" class="px-4 py-2.5 rounded-xl glass-card text-gray-400 hover:text-white font-semibold text-xs transition">
-              Reset
-            </button>
-          </div>
-        </div>
-
-        <!-- Activity Logger -->
-        <div class="glass-card rounded-2xl p-6 space-y-4 border border-white/10">
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-stopwatch text-cyber-pink"></i> Manual Screen Log
-          </h3>
-          <form id="activityForm" class="space-y-3">
-            <div>
-              <label class="text-xs text-gray-400 block mb-1">Activity Name</label>
-              <input type="text" id="actName" required placeholder="e.g., Coding / Reading" class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-cyber-pink">
-            </div>
-            <div>
-              <label class="text-xs text-gray-400 block mb-1">Duration (Minutes)</label>
-              <input type="number" id="actMins" required min="1" placeholder="30" class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-cyber-pink">
-            </div>
-            <button type="submit" class="w-full py-2.5 rounded-lg bg-cyber-pink hover:opacity-90 text-white font-semibold text-xs transition">
-              Log Minutes
-            </button>
+            <input type="date" id="taskDeadlineInput" class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white">
+            <button type="submit" id="taskSubmitBtn" class="w-full py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs">Save Task</button>
           </form>
         </div>
+        <div class="glass-card rounded-2xl p-5 md:col-span-2 space-y-4 border border-white/10">
+          <h3 class="text-sm font-bold text-white">Daily Task Queue</h3>
+          <div id="taskListContainer" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+
+      <div id="subpanel-pmo" class="hidden space-y-5">
+        <div class="glass-card rounded-2xl p-5 border border-purple-500/30 space-y-4">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div class="p-3 rounded-xl bg-gray-900/60"><p class="text-[10px] text-gray-400">Clean Streak</p><p id="pmoCurrentStreakVal" class="text-xl font-black text-emerald-400">0 Days</p></div>
+            <div class="p-3 rounded-xl bg-gray-900/60"><p class="text-[10px] text-gray-400">Best Streak</p><p id="pmoBestStreakVal" class="text-xl font-black text-cyber-blue">0 Days</p></div>
+            <div class="p-3 rounded-xl bg-gray-900/60"><p class="text-[10px] text-gray-400">Total Clean</p><p id="pmoTotalCleanVal" class="text-xl font-black text-white">0</p></div>
+            <div class="p-3 rounded-xl bg-gray-900/60"><p class="text-[10px] text-gray-400">Relapses</p><p id="pmoTotalRelapsesVal" class="text-xl font-black text-red-400">0</p></div>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" onclick="PMOManager.recordCleanDay()" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">Mark Today Clean</button>
+            <button type="button" onclick="PMOManager.openRelapseModal()" class="px-4 py-2 rounded-xl bg-red-600/30 text-red-300 text-xs font-bold">Record Relapse</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="subpanel-reminders" class="hidden space-y-4">
+        <div class="glass-card rounded-2xl p-5 space-y-3 border border-white/10">
+          <h3 class="text-sm font-bold text-white">Scheduled Reminders</h3>
+          <div id="reminderListContainer" class="space-y-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: PLANNER & FOCUS -->
+    <section id="view-planner" class="view-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 border border-brand-500/30 space-y-4">
+        <h2 id="plannerDateHeading" class="text-xl font-black text-white">Today</h2>
+        <button type="button" onclick="DailyPlanner.generateMorningPlan()" class="px-3.5 py-2 rounded-xl bg-brand-600 text-white text-xs font-semibold">Morning Plan (AI)</button>
+      </div>
+    </section>
+
+    <!-- VIEW 5: SECOND BRAIN & KNOWLEDGE VAULT -->
+    <section id="view-brain" class="view-panel hidden space-y-6">
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="KnowledgeEngine.switchBrainSubTab('vault')" class="px-3 py-2 rounded-xl bg-emerald-600/30 text-white font-semibold text-xs">Vault</button>
+        <button type="button" onclick="KnowledgeEngine.switchBrainSubTab('docs')" class="px-3 py-2 rounded-xl glass-card text-gray-300 font-semibold text-xs">Documents</button>
+        <button type="button" onclick="KnowledgeEngine.switchBrainSubTab('learn')" class="px-3 py-2 rounded-xl glass-card text-gray-300 font-semibold text-xs">Study & Quiz</button>
+        <button type="button" onclick="LiveIntelligence.openLiveTab()" class="px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-600/40 to-cyan-600/40 text-cyan-200 font-semibold text-xs">Live Intel</button>
+      </div>
+
+      <div id="brain-panel-vault" class="space-y-6">
+        <div class="flex gap-2">
+          <input type="text" id="noteSearchInput" oninput="NotesManager.render()" placeholder="Search vault notes..." class="flex-1 glass-card px-3 py-2.5 rounded-xl bg-gray-900/60 text-xs text-white">
+          <button onclick="openNoteModal()" class="px-3.5 py-2 rounded-xl bg-emerald-600 text-white font-semibold text-xs">+ Note</button>
+        </div>
+        <div id="notesGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+      </div>
+
+      <div id="brain-panel-docs" class="hidden space-y-4">
+        <input type="file" id="knowledgeFileInput" multiple accept=".pdf,.txt,.md,.docx" onchange="KnowledgeEngine.handleFileUpload(event)">
+        <div id="docLibraryList" class="space-y-2"></div>
+      </div>
+
+      <div id="brain-panel-learn" class="hidden space-y-4">
+        <div id="activeQuizContainer" class="hidden p-4 rounded-xl bg-gray-950/80"></div>
+      </div>
+
+      <div id="brain-panel-live" class="hidden space-y-4">
+        <div class="flex gap-2">
+          <input type="text" id="liveSearchInput" placeholder="Live web search..." class="flex-1 glass-card px-3 py-2 rounded-xl bg-gray-900 text-xs text-white">
+          <button type="button" onclick="LiveIntelligence.runLiveSearch()" class="px-4 py-2 rounded-xl bg-cyan-600 text-white font-bold text-xs">Search</button>
+        </div>
+        <div id="liveSearchSummaryText" class="text-xs text-gray-200 whitespace-pre-wrap"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 6: CREATOR STUDIO 2.0 (UPGRADED) -->
+    <section id="view-studio" class="view-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-5 border border-purple-500/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-cyber-blue">Creator Studio 2.0 • @nikl.writes &amp; Nikhil Winter Core</span>
+          <h2 class="text-xl font-black text-white flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> Professional AI Script Engine
+          </h2>
+          <p class="text-xs text-gray-400 mt-0.5">Generate emotional storytelling, relationship psychology, self-improvement, and viral short video scripts in natural Hinglish.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="StudioEngine.switchSubTab('generator')" id="stu-sub-gen-btn" class="px-3 py-2 rounded-xl bg-purple-600/40 border border-purple-400/50 text-white text-xs font-semibold">
+            <i class="fa-solid fa-pen-nib mr-1"></i>Script Generator
+          </button>
+          <button type="button" onclick="StudioEngine.switchSubTab('bulk')" id="stu-sub-bulk-btn" class="px-3 py-2 rounded-xl glass-card text-gray-300 hover:text-white text-xs font-semibold">
+            <i class="fa-solid fa-layer-group mr-1"></i>Bulk Generator
+          </button>
+          <button type="button" onclick="StudioEngine.switchSubTab('library')" id="stu-sub-lib-btn" class="px-3 py-2 rounded-xl glass-card text-gray-300 hover:text-white text-xs font-semibold">
+            <i class="fa-solid fa-book-bookmark mr-1"></i>Saved Library (<span id="studioLibCountBadge">0</span>)
+          </button>
+          <button type="button" onclick="StudioEngine.switchSubTab('collections')" id="stu-sub-col-btn" class="px-3 py-2 rounded-xl glass-card text-gray-300 hover:text-white text-xs font-semibold">
+            <i class="fa-solid fa-folder-open mr-1"></i>Collections
+          </button>
+        </div>
+      </div>
+
+      <!-- SUBPANEL 6A: ADVANCED SCRIPT GENERATOR & TOOLS -->
+      <div id="studio-panel-generator" class="space-y-5">
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="glass-card rounded-2xl p-5 space-y-3.5 md:col-span-1 border border-white/15 h-fit">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-cyan-400"></i> Script Parameters
+            </h3>
+            <form id="studioGenForm" class="space-y-3 text-xs">
+              <div>
+                <label class="text-gray-400 block mb-1 font-semibold">Category</label>
+                <select id="stuCategory" class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-white focus:outline-none focus:border-purple-400">
+                  <option value="Relationship Psychology">Relationship Psychology</option>
+                  <option value="Love & Heartbreak" selected>Love &amp; Heartbreak</option>
+                  <option value="Breakups & Moving On">Breakups &amp; Moving On</option>
+                  <option value="Situationships">Situationships</option>
+                  <option value="Human Behaviour">Human Behaviour</option>
+                  <option value="Self-Improvement">Self-Improvement</option>
+                  <option value="Discipline & Motivation">Discipline &amp; Motivation</option>
+                  <option value="Confidence & Personality">Confidence &amp; Personality</option>
+                  <option value="Life Lessons">Life Lessons</option>
+                  <option value="Emotional Intelligence">Emotional Intelligence</option>
+                  <option value="Social Psychology">Social Psychology</option>
+                  <option value="Storytelling">Storytelling</option>
+                  <option value="POV Scripts">POV Scripts</option>
+                  <option value="Educational Content">Educational Content</option>
+                  <option value="Custom Topic">Custom Topic</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-gray-400 block mb-1 font-semibold">Topic / Core Idea</label>
+                <input type="text" id="stuTopicInput" required placeholder="e.g. When someone acts distant but doesn't let you go..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-white focus:outline-none focus:border-purple-400">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-gray-400 block mb-1 font-semibold">Language</label>
+                  <select id="stuLang" class="w-full glass-card p-2 rounded-lg bg-gray-900 text-white focus:outline-none">
+                    <option value="Hinglish" selected>Natural Hinglish</option>
+                    <option value="English">Simple English</option>
+                    <option value="Hindi">Hindi</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-gray-400 block mb-1 font-semibold">Duration</label>
+                  <select id="stuDuration" class="w-full glass-card p-2 rounded-lg bg-gray-900 text-white focus:outline-none">
+                    <option value="20-30s" selected>20–30s (Short Reel)</option>
+                    <option value="45-60s">45–60s (Detailed)</option>
+                    <option value="90s+">90s+ (Deep Dive)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-gray-400 block mb-1 font-semibold">Tone</label>
+                  <select id="stuTone" class="w-full glass-card p-2 rounded-lg bg-gray-900 text-white focus:outline-none">
+                    <option value="Raw &amp; Honest" selected>Raw &amp; Honest</option>
+                    <option value="Calm &amp; Reflective">Calm &amp; Reflective</option>
+                    <option value="Direct &amp; Hard-Hitting">Direct &amp; Hard-Hitting</option>
+                    <option value="Empathetic &amp; Warm">Empathetic &amp; Warm</option>
+                    <option value="Cinematic Storytelling">Cinematic Storytelling</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-gray-400 block mb-1 font-semibold">Platform</label>
+                  <select id="stuPlatform" class="w-full glass-card p-2 rounded-lg bg-gray-900 text-white focus:outline-none">
+                    <option value="Instagram Reel" selected>Instagram Reel (@nikl.writes)</option>
+                    <option value="YouTube Short">YouTube Short</option>
+                    <option value="Carousel">Carousel Script</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="text-gray-400 block mb-1 font-semibold">Special Instructions (Optional)</label>
+                <input type="text" id="stuInstructions" placeholder="e.g. Focus on emotional detachment and self-respect..." class="w-full glass-card p-2 rounded-lg bg-gray-900 text-white focus:outline-none">
+              </div>
+
+              <button type="submit" id="stuGenerateBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyber-blue text-white font-bold text-xs hover:opacity-95 shadow-lg shadow-purple-500/20 transition">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>Generate Script
+              </button>
+            </form>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5 space-y-4 md:col-span-2 border border-white/15">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+              <div>
+                <span id="stuActiveCategoryBadge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30">Relationship Psychology</span>
+                <h3 id="stuActiveTitleDisplay" class="text-base font-black text-white mt-1">Generated Script Title</h3>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="StudioEngine.runToolAction('hook')" class="px-2.5 py-1.5 rounded-lg bg-cyan-600/30 border border-cyan-500/40 text-cyan-200 text-[11px] font-semibold"><i class="fa-solid fa-bolt mr-1"></i>Hooker</button>
+                <button type="button" onclick="StudioEngine.runToolAction('improve')" class="px-2.5 py-1.5 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 text-[11px] font-semibold"><i class="fa-solid fa-sparkles mr-1"></i>Improver</button>
+                <button type="button" onclick="StudioEngine.runToolAction('caption')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/30 border border-emerald-500/40 text-emerald-200 text-[11px] font-semibold"><i class="fa-solid fa-quote-left mr-1"></i>Caption</button>
+                <button type="button" onclick="StudioEngine.runToolAction('analyze')" class="px-2.5 py-1.5 rounded-lg bg-amber-600/30 border border-amber-500/40 text-amber-200 text-[11px] font-semibold"><i class="fa-solid fa-stethoscope mr-1"></i>Analyze</button>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Script Content (Editable)</label>
+              <textarea id="stuScriptContentEditor" rows="8" class="w-full font-sans text-xs glass-card p-3.5 rounded-xl bg-gray-950 text-gray-100 focus:outline-none focus:border-purple-400 leading-relaxed" placeholder="Generated script content will appear here..."></textarea>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="StudioEngine.saveCurrentScript()" class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition">
+                  <i class="fa-solid fa-bookmark mr-1"></i>Save to Library
+                </button>
+                <button type="button" onclick="StudioEngine.previewVoice()" class="px-3.5 py-2 rounded-lg bg-cyan-600/30 border border-cyan-500/40 text-cyan-200 hover:bg-cyan-600/40 font-semibold text-xs transition">
+                  <i class="fa-solid fa-volume-high mr-1"></i>Voice Preview
+                </button>
+              </div>
+              <div class="flex gap-2">
+                <select id="stuExportFormat" class="glass-card px-2.5 py-1.5 rounded-lg bg-gray-900 text-xs text-white">
+                  <option value="txt">TXT</option>
+                  <option value="docx">DOCX</option>
+                  <option value="pdf">PDF</option>
+                </select>
+                <button type="button" onclick="StudioEngine.exportActiveScript()" class="px-3.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs">
+                  <i class="fa-solid fa-download mr-1"></i>Export
+                </button>
+              </div>
+            </div>
+
+            <div id="stuToolOutputBox" class="hidden p-3.5 rounded-xl bg-gray-950/80 border border-purple-500/30 space-y-1.5 text-xs text-gray-200 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBPANEL 6B: BULK SCRIPT GENERATION -->
+      <div id="studio-panel-bulk" class="hidden space-y-5">
+        <div class="glass-card rounded-2xl p-6 border border-purple-500/30 space-y-4">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-purple-300">High-Volume Content Production</span>
+            <h3 class="text-base font-bold text-white">Bulk Script Generator (10, 30, 50, 100 Scripts or Series)</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Generate multiple unique scripts in one run with automated title generation, varied hooks, and zero repetition.</p>
+          </div>
+
+          <form id="studioBulkForm" class="grid sm:grid-cols-4 gap-3 text-xs">
+            <div class="sm:col-span-2">
+              <label class="text-gray-400 block mb-1 font-semibold">Batch Topic / Series Theme</label>
+              <input type="text" id="bulkTopicInput" required placeholder="e.g. 30 Days of Emotional Intelligence &amp; Boundaries" class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-white focus:outline-none">
+            </div>
+            <div>
+              <label class="text-gray-400 block mb-1 font-semibold">Category</label>
+              <select id="bulkCategory" class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-white">
+                <option value="Relationship Psychology">Relationship Psychology</option>
+                <option value="Love & Heartbreak" selected>Love &amp; Heartbreak</option>
+                <option value="Self-Improvement">Self-Improvement</option>
+                <option value="Life Lessons">Life Lessons</option>
+                <option value="Confidence & Personality">Confidence &amp; Personality</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-gray-400 block mb-1 font-semibold">Script Count</label>
+              <select id="bulkCount" class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-white">
+                <option value="5">5 Scripts</option>
+                <option value="10" selected>10 Scripts</option>
+                <option value="30">30 Scripts (Series)</option>
+                <option value="50">50 Scripts</option>
+                <option value="100">100 Scripts</option>
+              </select>
+            </div>
+            <div class="sm:col-span-4 flex items-center justify-between pt-2">
+              <span id="bulkProgressLabel" class="text-xs font-semibold text-cyan-300">Ready to start bulk generation.</span>
+              <button type="submit" id="bulkStartBtn" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs">
+                <i class="fa-solid fa-layer-group mr-1.5"></i>Start Bulk Generation
+              </button>
+            </div>
+          </form>
+
+          <div id="bulkResultsContainer" class="space-y-2 max-h-96 overflow-y-auto pr-1 pt-2"></div>
+        </div>
+      </div>
+
+      <!-- SUBPANEL 6C: SAVED SCRIPT LIBRARY -->
+      <div id="studio-panel-library" class="hidden space-y-5">
+        <div class="glass-card rounded-2xl p-5 border border-white/10 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="relative flex-1">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-500 text-xs"></i>
+              <input type="text" id="studioLibSearch" oninput="StudioEngine.renderLibrary()" placeholder="Search saved scripts by title, content, or tags..." class="w-full glass-card pl-8 pr-3 py-2.5 rounded-xl bg-gray-900 text-xs text-white focus:outline-none">
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <select id="studioLibCatFilter" onchange="StudioEngine.renderLibrary()" class="glass-card px-3 py-2 rounded-xl bg-gray-900 text-xs text-white">
+                <option value="all">All Categories</option>
+                <option value="Relationship Psychology">Relationship Psychology</option>
+                <option value="Love & Heartbreak">Love &amp; Heartbreak</option>
+                <option value="Breakups & Moving On">Breakups &amp; Moving On</option>
+                <option value="Situationships">Situationships</option>
+                <option value="Human Behaviour">Human Behaviour</option>
+                <option value="Self-Improvement">Self-Improvement</option>
+                <option value="Life Lessons">Life Lessons</option>
+              </select>
+              <button type="button" onclick="StudioEngine.exportSelectedBatch()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs">
+                Export Selected
+              </button>
+            </div>
+          </div>
+
+          <div id="studioLibraryList" class="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
+            <p class="text-xs text-gray-500">No scripts saved in your library yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBPANEL 6D: COLLECTIONS -->
+      <div id="studio-panel-collections" class="hidden space-y-5">
+        <div class="glass-card rounded-2xl p-5 border border-white/10 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-white">Script Collections</h3>
+              <p class="text-[11px] text-gray-400">Organise your scripts into dedicated series or content themes.</p>
+            </div>
+            <button type="button" onclick="StudioEngine.promptNewModalCollection()" class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs">
+              <i class="fa-solid fa-plus mr-1"></i>New Collection
+            </button>
+          </div>
+
+          <div id="studioCollectionsGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 7: TRADING -->
+    <section id="view-trading" class="view-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-5 border border-cyan-500/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-cyan-400">Educational Analysis & Risk Discipline</span>
+          <h2 class="text-xl font-black text-white">Swing Trading Command Center</h2>
+          <p class="text-xs text-gray-400 mt-0.5">Educational chart breakdown, structured 5-level course, and trade journal.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" id="trade-sub-chart-btn" onclick="switchTradingSubTab('chart')" class="px-3 py-2 rounded-xl bg-cyan-600/30 border border-cyan-500/50 text-white text-xs font-semibold">Chart Analysis</button>
+          <button type="button" id="trade-sub-course-btn" onclick="switchTradingSubTab('course')" class="px-3 py-2 rounded-xl glass-card text-gray-300 text-xs font-semibold">Course</button>
+          <button type="button" id="trade-sub-journal-btn" onclick="switchTradingSubTab('journal')" class="px-3 py-2 rounded-xl glass-card text-gray-300 text-xs font-semibold">Journal</button>
+        </div>
+      </div>
+
+      <div id="trade-panel-chart" class="grid md:grid-cols-3 gap-6">
+        <div class="glass-card rounded-2xl p-5 space-y-3 md:col-span-1 border border-white/10 h-fit">
+          <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-camera text-cyan-400 mr-1.5"></i>Upload Chart Screenshot</h3>
+          <input type="file" id="chartImageInput" accept="image/*" onchange="SwingTrading.handleChartUpload(event)" class="w-full text-xs text-gray-300">
+          <div id="chartPreviewBox" class="hidden rounded-xl overflow-hidden border border-white/10 bg-gray-950">
+            <img id="chartPreviewImg" src="" alt="Chart preview" class="w-full max-h-48 object-contain">
+          </div>
+          <input type="text" id="chartSymbolInput" placeholder="Stock/Asset (e.g. NIFTY)" class="w-full glass-card p-2 rounded-lg bg-gray-900 text-xs text-white">
+          <button type="button" onclick="SwingTrading.analyzeChart()" id="analyzeChartBtn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 text-white font-bold text-xs">Analyse Chart</button>
+        </div>
+        <div class="glass-card rounded-2xl p-5 md:col-span-2 space-y-3 border border-white/10">
+          <h3 class="text-sm font-bold text-white">Structured Setup Breakdown</h3>
+          <div id="chartAnalysisOutput" class="text-xs text-gray-200 whitespace-pre-wrap bg-gray-950/60 p-4 rounded-xl min-h-[260px]">Upload a chart screenshot to run an educational analysis.</div>
+        </div>
+      </div>
+
+      <div id="trade-panel-course" class="hidden grid md:grid-cols-3 gap-6">
+        <div class="glass-card rounded-2xl p-4 space-y-3 md:col-span-1 border border-white/10 max-h-[600px] overflow-y-auto">
+          <h3 class="text-sm font-bold text-white">Course Curriculum</h3>
+          <div id="tradingCurriculumList" class="space-y-3"></div>
+        </div>
+        <div class="glass-card rounded-2xl p-5 md:col-span-2 space-y-4 border border-white/10">
+          <div id="activeLessonContainer" class="space-y-4"></div>
+        </div>
+      </div>
+
+      <div id="trade-panel-journal" class="hidden space-y-5">
+        <div class="glass-card rounded-2xl p-5 border border-white/10 space-y-3">
+          <h3 class="text-sm font-bold text-white">Recorded Trades</h3>
+          <div id="tradeJournalList" class="space-y-2.5 max-h-[520px] overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 8: ORACLE -->
+    <section id="view-oracle" class="view-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-5 border border-purple-500/35 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-purple-300">Personal Life Analytics &amp; Intelligence Engine</span>
+          <h2 class="text-xl font-black text-white flex items-center gap-2">
+            <i class="fa-solid fa-eye text-cyber-blue"></i> ORACLE Intelligence Core
+          </h2>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="glass-card p-3.5 rounded-xl border-l-4 border-purple-500"><p class="text-[10px] text-gray-400 uppercase font-bold">Overall Score</p><p id="oraOverallScore" class="text-xl font-black text-white mt-0.5">0%</p></div>
+        <div class="glass-card p-3.5 rounded-xl border-l-4 border-cyber-blue"><p class="text-[10px] text-gray-400 uppercase font-bold">Habit Completion</p><p id="oraHabitRate" class="text-lg font-black text-emerald-400 mt-0.5">0%</p></div>
+        <div class="glass-card p-3.5 rounded-xl border-l-4 border-indigo-400"><p class="text-[10px] text-gray-400 uppercase font-bold">Task Rate</p><p id="oraTaskRate" class="text-lg font-black text-purple-300 mt-0.5">0%</p></div>
+        <div class="glass-card p-3.5 rounded-xl border-l-4 border-pink-500"><p class="text-[10px] text-gray-400 uppercase font-bold">RPG Rank</p><p id="oraRpgProgress" class="text-lg font-black text-white mt-0.5">E</p></div>
+      </div>
+    </section>
+
+    <!-- VIEW 9: FORGE -->
+    <section id="view-forge" class="view-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-5 border border-purple-500/40">
+        <h2 class="text-xl font-black text-white">NEXUS FORGE Command Centre</h2>
+        <p class="text-xs text-gray-400">Autonomous local/cloud development engine.</p>
       </div>
     </section>
 
   </main>
 
-  <!-- BOTTOM NAVIGATION BAR (Mobile First App Style) -->
+  <!-- BOTTOM NAVIGATION BAR -->
   <nav class="fixed bottom-0 left-0 right-0 z-40 glass-nav py-2 px-3">
-    <div class="max-w-md mx-auto flex items-center justify-between">
+    <div class="max-w-xl mx-auto flex items-center justify-between">
       <button onclick="switchTab('home')" id="nav-home" class="nav-btn active flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
-        <i class="fa-solid fa-house text-lg"></i>
-        <span class="text-[10px] font-medium">Home</span>
+        <i class="fa-solid fa-house text-base"></i>
+        <span class="text-[9px] font-medium">Home</span>
       </button>
-
       <button onclick="switchTab('friday')" id="nav-friday" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
-        <i class="fa-solid fa-microphone text-lg"></i>
-        <span class="text-[10px] font-medium">FRIDAY</span>
+        <i class="fa-solid fa-microphone text-base"></i>
+        <span class="text-[9px] font-medium">FRIDAY</span>
       </button>
-
-      <button onclick="switchTab('rpg')" id="nav-rpg" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
-        <i class="fa-solid fa-shield-halved text-lg"></i>
-        <span class="text-[10px] font-medium">RPG</span>
+      <button onclick="switchTab('tasks')" id="nav-tasks" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
+        <i class="fa-solid fa-list-check text-base"></i>
+        <span class="text-[9px] font-medium">Tasks</span>
       </button>
-
+      <button onclick="switchTab('planner')" id="nav-planner" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
+        <i class="fa-solid fa-calendar-check text-base"></i>
+        <span class="text-[9px] font-medium">Planner</span>
+      </button>
       <button onclick="switchTab('brain')" id="nav-brain" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
-        <i class="fa-solid fa-brain text-lg"></i>
-        <span class="text-[10px] font-medium">Brain</span>
+        <i class="fa-solid fa-brain text-base"></i>
+        <span class="text-[9px] font-medium">Brain</span>
       </button>
-
       <button onclick="switchTab('studio')" id="nav-studio" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
-        <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
-        <span class="text-[10px] font-medium">Studio</span>
+        <i class="fa-solid fa-wand-magic-sparkles text-base"></i>
+        <span class="text-[9px] font-medium">Studio</span>
       </button>
-
-      <button onclick="switchTab('phone')" id="nav-phone" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
-        <i class="fa-solid fa-mobile-screen-button text-lg"></i>
-        <span class="text-[10px] font-medium">Phone</span>
+      <button onclick="switchTab('trading')" id="nav-trading" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
+        <i class="fa-solid fa-chart-line text-base"></i>
+        <span class="text-[9px] font-medium">Trading</span>
+      </button>
+      <button onclick="switchTab('oracle')" id="nav-oracle" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
+        <i class="fa-solid fa-eye text-base"></i>
+        <span class="text-[9px] font-medium">ORACLE</span>
+      </button>
+      <button onclick="switchTab('forge')" id="nav-forge" class="nav-btn flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
+        <i class="fa-solid fa-code text-base"></i>
+        <span class="text-[9px] font-medium">FORGE</span>
       </button>
     </div>
   </nav>
 
-  <!-- SETTINGS & API MODAL -->
+  <!-- PERSISTENT MEMORY MODAL -->
+  <div id="memoryModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-card rounded-2xl max-w-2xl w-full p-6 border border-white/10 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-base font-bold text-white"><i class="fa-solid fa-database text-cyber-blue mr-2"></i>Persistent Memory Core</h3>
+        <button onclick="closeMemoryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="memoryListContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
   <div id="settingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass-card rounded-2xl max-w-md w-full p-6 border border-white/10 space-y-5 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-cyber-blue"></i> NEXUS Configuration
-        </h3>
-        <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <h3 class="text-base font-bold text-white"><i class="fa-solid fa-sliders text-cyber-blue mr-2"></i>NEXUS Configuration</h3>
+        <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
-      <!-- Provider Selector -->
       <div class="space-y-3">
         <label class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Active LLM Provider</label>
-        <select id="apiProviderSelect" onchange="onProviderChange()" class="w-full glass-card p-3 rounded-xl bg-gray-900/80 text-xs text-white focus:outline-none focus:border-cyber-blue">
-          <option value="groq">Groq (Llama-3 Free / Fast)</option>
+        <select id="apiProviderSelect" onchange="onProviderChange()" class="w-full glass-card p-3 rounded-xl bg-gray-900/80 text-xs text-white">
+          <option value="groq">Groq (openai/gpt-oss-20b)</option>
           <option value="openrouter">OpenRouter (Multi-Model)</option>
           <option value="gemini">Google Gemini API</option>
         </select>
       </div>
-
-      <!-- API Key Inputs -->
       <div class="space-y-3">
-        <div>
-          <label class="text-xs text-gray-400 block mb-1">Groq API Key</label>
-          <input type="password" id="groqKeyInput" placeholder="gsk_..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-cyber-blue">
-        </div>
-        <div>
-          <label class="text-xs text-gray-400 block mb-1">OpenRouter API Key</label>
-          <input type="password" id="openrouterKeyInput" placeholder="sk-or-..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-cyber-blue">
-        </div>
-        <div>
-          <label class="text-xs text-gray-400 block mb-1">Gemini API Key</label>
-          <input type="password" id="geminiKeyInput" placeholder="AIzaSy..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-cyber-blue">
-        </div>
+        <div><label class="text-xs text-gray-400 block mb-1">Groq API Key</label><input type="password" id="groqKeyInput" placeholder="gsk_..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-xs text-white"></div>
+        <div><label class="text-xs text-gray-400 block mb-1">OpenRouter API Key</label><input type="password" id="openrouterKeyInput" placeholder="sk-or-..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-xs text-white"></div>
+        <div><label class="text-xs text-gray-400 block mb-1">Gemini API Key</label><input type="password" id="geminiKeyInput" placeholder="AIzaSy..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-xs text-white"></div>
       </div>
-
-      <!-- Speech / Voice Options -->
-      <div class="border-t border-white/10 pt-4 space-y-3">
-        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Speech & TTS Settings</h4>
-        <div>
-          <label class="text-xs text-gray-400 block mb-1">Select TTS Voice</label>
-          <select id="voiceSelect" class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-cyber-blue">
-            <option value="">Default System Voice</option>
-          </select>
-        </div>
-        <div class="flex gap-2">
-          <button type="button" onclick="VoiceService.testVoice()" class="flex-1 py-2 rounded-lg bg-cyber-blue/20 border border-cyber-blue/40 text-cyber-blue hover:bg-cyber-blue/30 text-xs font-semibold transition">
-            <i class="fa-solid fa-volume-high mr-1"></i> Test Voice
-          </button>
-        </div>
-      </div>
-
       <div class="pt-2 flex gap-3">
-        <button onclick="saveSettings()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-cyber-blue text-white font-bold text-xs hover:opacity-90 transition">
-          Save Settings
-        </button>
+        <button onclick="saveSettings()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-cyber-blue text-white font-bold text-xs">Save Settings</button>
       </div>
     </div>
   </div>
 
-  <!-- NOTE ADD MODAL -->
+  <!-- NOTE MODAL -->
   <div id="noteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass-card rounded-2xl max-w-md w-full p-6 border border-white/10 space-y-4">
       <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <h3 class="text-base font-bold text-white">New Vault Note</h3>
-        <button onclick="closeNoteModal()" class="text-gray-400 hover:text-white">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <h3 id="noteModalHeading" class="text-base font-bold text-white">New Vault Note</h3>
+        <button onclick="closeNoteModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <form id="noteForm" class="space-y-3">
-        <div>
-          <label class="text-xs text-gray-400 block mb-1">Title</label>
-          <input type="text" id="noteTitle" required placeholder="Note Title" class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-emerald-500">
-        </div>
-        <div>
-          <label class="text-xs text-gray-400 block mb-1">Content</label>
-          <textarea id="noteContent" rows="4" required placeholder="Write your ideas..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900/60 text-xs text-white focus:outline-none focus:border-emerald-500"></textarea>
-        </div>
-        <button type="submit" class="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition">
-          Save Note
-        </button>
+        <input type="hidden" id="editNoteId" value="">
+        <input type="text" id="noteTitle" required placeholder="Note Title" class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-xs text-white">
+        <select id="noteCategory" class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-xs text-white">
+          <option value="Idea">Idea</option>
+          <option value="Study">Study</option>
+          <option value="Project">Project</option>
+          <option value="Personal">Personal</option>
+        </select>
+        <textarea id="noteContent" rows="4" required placeholder="Write your notes..." class="w-full glass-card p-2.5 rounded-lg bg-gray-900 text-xs text-white"></textarea>
+        <button type="submit" class="w-full py-2.5 rounded-lg bg-emerald-600 text-white font-semibold text-xs">Save Note</button>
       </form>
     </div>
   </div>
 
-  <!-- JAVASCRIPT APPLICATION CORE -->
-  <script>
-    /* ==========================================================================
-       STORAGE & STATE MANAGER
-       ========================================================================== */
-    const STATE_KEY = 'NEXUS_SYSTEM_STATE_V3';
+  <!-- GLOSSARY MODAL -->
+  <div id="glossaryModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-card rounded-2xl max-w-lg w-full p-6 border border-cyan-500/30 space-y-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-base font-bold text-white">Symbols, Emojis & Trading Glossary</h3>
+        <button onclick="closeGlossaryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="glossaryContentList" class="space-y-2 text-xs"></div>
+    </div>
+  </div>
 
+  <!-- CORE SCRIPT LOGIC -->
+  <script>
+    const DateUtils = {
+      todayISO() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; },
+      tomorrowISO() { const d = new Date(); d.setDate(d.getDate() + 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; },
+      formatHumanDate(iso) { if (!iso) return 'No deadline'; if (iso === this.todayISO()) return 'Today'; if (iso === this.tomorrowISO()) return 'Tomorrow'; return iso; }
+    };
+    function escapeHTML(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+    const STATE_KEY = 'NEXUS_SYSTEM_STATE_V5';
     let state = {
       apiProvider: 'groq',
       keys: { groq: '', openrouter: '', gemini: '' },
-      rpg: { level: 1, exp: 0, quests: [] },
+      rpg: { level: 1, exp: 0 },
+      habits: [],
+      habitCompletions: {},
+      tasks: [],
+      reminders: [],
       notes: [],
       focusMinutes: 0,
-      selectedVoiceUri: ''
+      focusSessions: [],
+      studioScripts: [],
+      studioCollections: [],
+      eventHistory: [],
+      fridayActionLog: []
     };
 
     function loadState() {
       const saved = localStorage.getItem(STATE_KEY);
       if (saved) {
         try {
-          state = { ...state, ...JSON.parse(saved) };
-        } catch(e) { console.error('Failed state load', e); }
+          const parsed = JSON.parse(saved);
+          state = { ...state, ...parsed, keys: { ...state.keys, ...(parsed.keys || {}) } };
+        } catch (e) { console.error('State load error:', e); }
       }
-      // Populate defaults if empty
-      if (!state.rpg.quests.length) {
-        state.rpg.quests = [
-          { id: 1, title: 'Complete Morning Focus Session', exp: 25, done: false },
-          { id: 2, title: 'Write 1 New Second Brain Note', exp: 50, done: false }
-        ];
-      }
+      if (!Array.isArray(state.studioScripts)) state.studioScripts = [];
+      if (!Array.isArray(state.studioCollections)) state.studioCollections = [];
+      if (!Array.isArray(state.tasks)) state.tasks = [];
+      if (!Array.isArray(state.notes)) state.notes = [];
+      if (!Array.isArray(state.habits)) HabitManager.seedInitialHabits();
     }
 
     function saveState() {
       localStorage.setItem(STATE_KEY, JSON.stringify(state));
-      updateDashboardUI();
+      refreshAllViews();
     }
 
-    /* ==========================================================================
-       VOICE SERVICE (INCORPORATING ANDROID CHROME TTS FIX)
-       ========================================================================== */
-    const VoiceService = {
-      synth: window.speechSynthesis,
-      voices: [],
-
-      init() {
-        if (!this.synth) return;
-        this.populateVoices();
-        if (typeof this.synth.onvoiceschanged !== 'undefined') {
-          this.synth.onvoiceschanged = () => this.populateVoices();
-        }
-      },
-
-      populateVoices() {
-        if (!this.synth) return;
-        this.voices = this.synth.getVoices() || [];
-        const select = document.getElementById('voiceSelect');
-        if (!select) return;
-
-        select.innerHTML = '<option value="">Default System Voice</option>';
-        this.voices.forEach(v => {
-          const opt = document.createElement('option');
-          opt.value = v.voiceURI;
-          opt.textContent = `${v.name} (${v.lang})${v.localService ? ' [Offline]' : ''}`;
-          if (v.voiceURI === state.selectedVoiceUri) opt.selected = true;
-          select.appendChild(opt);
+    const NexusDB = {
+      db: null,
+      async init() {
+        return new Promise((resolve) => {
+          const req = indexedDB.open('NexusDB', 4);
+          req.onsuccess = (e) => { this.db = e.target.result; resolve(this.db); };
+          req.onerror = () => resolve(null);
         });
       },
-
-      speak(text) {
-        if (!this.synth || !text) return;
-
-        // 1. Flush any stuck Android Chrome speech queue unconditionally
-        try { this.synth.cancel(); } catch (e) {}
-
-        // 2. Clean markdown symbols that choke Android TTS
-        const cleanText = String(text)
-          .replace(/[*#_`~•]/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-
-        if (!cleanText) return;
-
-        const utter = new SpeechSynthesisUtterance(cleanText);
-
-        // 3. Select matching voice or fallback to localService offline voice
-        const voices = this.voices.length ? this.voices : this.synth.getVoices() || [];
-        
-        let targetVoice = null;
-        if (state.selectedVoiceUri) {
-          targetVoice = voices.find(v => v.voiceURI === state.selectedVoiceUri);
-        }
-        if (!targetVoice && voices.length) {
-          // Prioritize offline localService voices on Android Chrome
-          targetVoice =
-            voices.find(v => v.localService && /^en[-_](in|us|gb)/i.test(v.lang || '')) ||
-            voices.find(v => v.localService && /^en/i.test(v.lang || '')) ||
-            voices.find(v => v.localService) ||
-            voices[0];
-        }
-
-        if (targetVoice) {
-          utter.voice = targetVoice;
-          utter.lang = targetVoice.lang;
-        }
-
-        utter.onstart = () => updateOrbState('speaking');
-        utter.onend = () => updateOrbState('idle');
-        utter.onerror = (e) => {
-          console.error('[NEXUS TTS Error]', e);
-          updateOrbState('idle');
-        };
-
-        // 4. Delay by 80ms to ensure cancel() finishes on Android Chrome
-        setTimeout(() => {
-          try {
-            if (this.synth.paused) this.synth.resume();
-            this.synth.speak(utter);
-          } catch (err) {
-            console.error('[NEXUS Speak Failed]', err);
-            updateOrbState('idle');
-          }
-        }, 80);
+      async getAll(store) {
+        if (!this.db) return [];
+        return new Promise((res) => {
+          const req = this.db.transaction(store, 'readonly').objectStore(store).getAll();
+          req.onsuccess = () => res(req.result || []);
+          req.onerror = () => res([]);
+        });
       },
-
-      testVoice() {
-        this.speak("System test sequence initialized. Audio engine operating normally on NEXUS.");
+      async put(store, val) {
+        if (!this.db) return;
+        return new Promise((res) => {
+          const req = this.db.transaction(store, 'readwrite').objectStore(store).put(val);
+          req.onsuccess = () => res(req.result);
+          req.onerror = () => res(null);
+        });
       }
     };
 
-    /* ==========================================================================
-       SPEECH RECOGNITION (STT) SERVICE
-       ========================================================================== */
-    let recognition = null;
-    let isListening = false;
-
-    function initSpeechRecognition() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) return;
-
-      recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-
-      recognition.onstart = () => {
-        isListening = true;
-        updateOrbState('listening');
-      };
-
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('chatInput').value = transcript;
-        handleSendMessage(transcript);
-      };
-
-      recognition.onerror = () => {
-        isListening = false;
-        updateOrbState('idle');
-      };
-
-      recognition.onend = () => {
-        isListening = false;
-        if (document.getElementById('orbStatus').textContent.includes('Listening')) {
-          updateOrbState('idle');
-        }
-      };
-    }
-
-    function toggleVoiceInput() {
-      if (!recognition) {
-        initSpeechRecognition();
+    const HabitManager = {
+      seedInitialHabits() {
+        if (state.habits.length > 0) return;
+        ['Meditation.', 'Workout/Boxing.', 'Morning Visualization.', 'Content Skill.', 'Real Interaction.', 'Reading 7 Pages.'].forEach((h, i) => {
+          state.habits.push({ id: 'hab_' + i, title: h, exp: 100, active: true });
+        });
+      },
+      getTodayStats() {
+        const active = state.habits.filter(h => h.active);
+        const today = DateUtils.todayISO();
+        const done = state.habitCompletions[today] || [];
+        const count = active.filter(h => done.includes(h.id)).length;
+        const pct = active.length ? Math.round((count / active.length) * 100) : 0;
+        return { activeHabits: active, doneCount: count, totalCount: active.length, pct };
       }
-      if (!recognition) {
-        alert("Speech Recognition is not supported on this browser.");
-        return;
-      }
+    };
 
-      if (isListening) {
-        recognition.stop();
-      } else {
-        try { recognition.start(); } catch(e) {}
-      }
-    }
+    const TaskManager = {
+      getPendingTasks() { return state.tasks.filter(t => !t.done); }
+    };
 
-    /* ==========================================================================
-       AI LLM SERVICE (GROQ / OPENROUTER / GEMINI)
-       ========================================================================== */
-    async function queryAI(prompt) {
+    const VoiceService = {
+      synth: window.speechSynthesis,
+      speak(text) {
+        if (!this.synth || !text) return;
+        this.synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        this.synth.speak(utter);
+      },
+      stopAll() { if (this.synth) this.synth.cancel(); }
+    };
+
+    async function queryAI(prompt, context = []) {
       const provider = state.apiProvider;
       const key = state.keys[provider];
-
-      // Fallback mock response if no key is entered
       if (!key) {
-        return `[Offline Mode] Received: "${prompt}". Configure your ${provider.toUpperCase()} API Key in Settings for live responses!`;
+        return `[Offline Creator Mode] Generated response for: "${prompt}". (Add your API key in Settings for advanced AI generation).`;
       }
-
       try {
         if (provider === 'groq') {
           const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${key}`
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
             body: JSON.stringify({
-              model: 'llama-3.3-70b-versatile',
-              messages: [{ role: 'user', content: prompt }]
+              model: 'openai/gpt-oss-20b',
+              messages: [
+                { role: 'system', content: 'You are an expert AI scriptwriter for @nikl.writes and Nikhil Winter. Write engaging, relatable, emotional short video scripts in natural conversational Hinglish without cringe or filler.' },
+                { role: 'user', content: prompt }
+              ]
             })
           });
           const data = await res.json();
-          return data.choices?.[0]?.message?.content || 'No response from Groq.';
-        } else if (provider === 'openrouter') {
-          const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${key}`
-            },
-            body: JSON.stringify({
-              model: 'meta-llama/llama-3.1-8b-instruct:free',
-              messages: [{ role: 'user', content: prompt }]
-            })
-          });
-          const data = await res.json();
-          return data.choices?.[0]?.message?.content || 'No response from OpenRouter.';
-        } else if (provider === 'gemini') {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }]
-            })
-          });
-          const data = await res.json();
-          return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response from Gemini.';
+          return data.choices?.[0]?.message?.content || 'No response.';
         }
-      } catch (err) {
-        console.error('API Error:', err);
-        return `API Error: Unable to complete request via ${provider}. Check your API Key and connection.`;
+      } catch (e) {
+        return `AI Error: ${e.message}`;
       }
     }
 
-    /* ==========================================================================
-       UI NAVIGATION & CONTROLLERS
-       ========================================================================== */
-    function switchTab(tabId) {
+    const ActionEngine = {
+      async tryExecute(text) {
+        const lower = text.toLowerCase();
+        // FRIDAY Creator Studio integration commands
+        if (/(?:generate|create)\s+(\d+)\s+scripts?/i.test(lower)) {
+          const m = lower.match(/(\d+)\s+scripts?/);
+          const count = m ? parseInt(m[1], 10) : 5;
+          await StudioEngine.generateBulkBatch({ count, topic: text, category: 'Relationship Psychology' });
+          return { handled: true, reply: `Generated and saved ${count} scripts to your library.` };
+        }
+        if (/(?:export|save)\s+(?:my\s+)?(?:saved\s+)?scripts?\s+(?:to|into)\s+pdf/i.test(lower)) {
+          StudioEngine.exportAllAsPDF();
+          return { handled: true, reply: 'Exported your script library to PDF.' };
+        }
+        return { handled: false };
+      }
+    };
+
+    function switchTab(id) {
       document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-
-      const targetView = document.getElementById(`view-${tabId}`);
-      const targetNav = document.getElementById(`nav-${tabId}`);
-
-      if (targetView) targetView.classList.remove('hidden');
-      if (targetNav) targetNav.classList.add('active');
+      document.getElementById(`view-${id}`)?.classList.remove('hidden');
+      document.getElementById(`nav-${id}`)?.classList.add('active');
     }
 
-    function updateOrbState(mode) {
-      const orb = document.getElementById('fridayOrb');
-      const icon = document.getElementById('orbIcon');
-      const status = document.getElementById('orbStatus');
-
-      orb.className = 'friday-orb my-4 shadow-2xl flex items-center justify-center relative cursor-pointer ';
-
-      if (mode === 'listening') {
-        orb.classList.add('animate-orb-pulse', 'scale-110');
-        icon.className = 'fa-solid fa-microphone-lines text-cyan-300 text-3xl animate-bounce';
-        status.textContent = 'FRIDAY Listening...';
-      } else if (mode === 'thinking') {
-        orb.classList.add('animate-orb-think');
-        icon.className = 'fa-solid fa-cog text-purple-300 text-3xl';
-        status.textContent = 'FRIDAY Thinking...';
-      } else if (mode === 'speaking') {
-        orb.classList.add('animate-orb-speak');
-        icon.className = 'fa-solid fa-volume-high text-pink-300 text-3xl';
-        status.textContent = 'FRIDAY Speaking...';
-      } else {
-        orb.classList.add('animate-orb-pulse');
-        icon.className = 'fa-solid fa-microphone text-white text-2xl';
-        status.textContent = 'FRIDAY Idle';
-      }
-    }
-
-    async function handleSendMessage(msgText) {
-      const input = document.getElementById('chatInput');
-      const text = msgText || input.value.trim();
-      if (!text) return;
-
-      input.value = '';
-      appendChatMessage('user', text);
-      updateOrbState('thinking');
-
-      const response = await queryAI(text);
-      appendChatMessage('assistant', response);
-      updateOrbState('idle');
-
-      const autoSpeak = document.getElementById('toggleAutoSpeak').checked;
-      if (autoSpeak) {
-        VoiceService.speak(response);
-      }
-    }
-
-    function appendChatMessage(role, text) {
-      const stream = document.getElementById('chatStream');
-      const div = document.createElement('div');
-      div.className = 'flex items-start gap-3 ' + (role === 'user' ? 'flex-row-reverse' : '');
-
-      const avatar = document.createElement('div');
-      avatar.className = `w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-        role === 'user' ? 'bg-purple-600 text-white' : 'bg-cyber-blue/20 text-cyber-blue'
-      }`;
-      avatar.textContent = role === 'user' ? 'U' : 'F';
-
-      const bubble = document.createElement('div');
-      bubble.className = `rounded-2xl p-3.5 max-w-[85%] text-xs leading-relaxed border ${
-        role === 'user'
-          ? 'bg-purple-900/40 text-purple-100 rounded-tr-none border-purple-500/30'
-          : 'bg-gray-800/80 text-gray-200 rounded-tl-none border-white/5'
-      }`;
-      bubble.textContent = text;
-
-      div.appendChild(avatar);
-      div.appendChild(bubble);
-      stream.appendChild(div);
-      stream.scrollTop = stream.scrollHeight;
-    }
-
-    /* ==========================================================================
-       LIFE RPG LOGIC
-       ========================================================================== */
-    function renderQuests() {
-      const container = document.getElementById('questList');
-      container.innerHTML = '';
-
-      state.rpg.quests.forEach(q => {
-        const item = document.createElement('div');
-        item.className = `p-3 rounded-xl glass-card flex items-center justify-between border ${
-          q.done ? 'border-emerald-500/30 opacity-60' : 'border-white/5'
-        }`;
-
-        item.innerHTML = `
-          <div class="flex items-center gap-3">
-            <input type="checkbox" ${q.done ? 'checked disabled' : ''} onchange="completeQuest(${q.id})" class="w-4 h-4 rounded accent-purple-500 cursor-pointer">
-            <span class="text-xs font-medium text-white ${q.done ? 'line-through text-gray-400' : ''}">${q.title}</span>
-          </div>
-          <span class="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md">+${q.exp} XP</span>
-        `;
-        container.appendChild(item);
+    function switchTaskSubTab(sub) {
+      ['habits', 'tasks', 'pmo', 'reminders'].forEach(id => {
+        document.getElementById(`subpanel-${id}`)?.classList.toggle('hidden', id !== sub);
       });
     }
 
-    function completeQuest(id) {
-      const q = state.rpg.quests.find(x => x.id === id);
-      if (q && !q.done) {
-        q.done = true;
-        addExp(q.exp);
-        renderQuests();
-      }
-    }
-
-    function addExp(amount) {
-      state.rpg.exp += amount;
-      const targetExp = state.rpg.level * 100;
-      if (state.rpg.exp >= targetExp) {
-        state.rpg.level += 1;
-        state.rpg.exp -= targetExp;
-        VoiceService.speak(`Congratulations! You leveled up to Level ${state.rpg.level}`);
-      }
-      saveState();
-      renderRPGStats();
-    }
-
-    function renderRPGStats() {
-      const targetExp = state.rpg.level * 100;
-      const pct = Math.min(100, Math.floor((state.rpg.exp / targetExp) * 100));
-
-      document.getElementById('rpgLevelText').textContent = `Level ${state.rpg.level} Explorer`;
-      document.getElementById('rpgExpText').textContent = `${state.rpg.exp} / ${targetExp} EXP`;
-      document.getElementById('rpgProgressBar').style.width = `${pct}%`;
-
-      document.getElementById('dashLevel').textContent = `Lvl ${state.rpg.level}`;
-      document.getElementById('dashExp').textContent = `${state.rpg.exp} XP`;
-    }
-
-    /* ==========================================================================
-       SECOND BRAIN NOTES LOGIC
-       ========================================================================== */
-    function renderNotes() {
-      const grid = document.getElementById('notesGrid');
-      grid.innerHTML = '';
-
-      if (!state.notes.length) {
-        grid.innerHTML = '<p class="text-xs text-gray-500 col-span-full">Vault empty. Click + New Note to add one.</p>';
-        return;
-      }
-
-      state.notes.forEach((n, idx) => {
-        const card = document.createElement('div');
-        card.className = 'glass-card p-4 rounded-xl space-y-2 border border-white/5 relative group';
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <h4 class="font-bold text-white text-xs">${n.title}</h4>
-            <button onclick="deleteNote(${idx})" class="text-gray-500 hover:text-red-400 text-xs">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
-          <p class="text-[11px] text-gray-300 line-clamp-3 leading-relaxed">${n.content}</p>
-        `;
-        grid.appendChild(card);
+    function switchTradingSubTab(sub) {
+      ['chart', 'course', 'journal'].forEach(id => {
+        document.getElementById(`trade-panel-${id}`)?.classList.toggle('hidden', id !== sub);
       });
-
-      document.getElementById('dashNotesCount').textContent = state.notes.length;
     }
 
-    function deleteNote(idx) {
-      state.notes.splice(idx, 1);
-      saveState();
-      renderNotes();
-    }
-
-    /* ==========================================================================
-       CREATIVE STUDIO LOGIC
-       ========================================================================== */
-    async function generateCreativeContent() {
-      const type = document.getElementById('studioType').value;
-      const prompt = document.getElementById('studioPrompt').value.trim();
-      const btn = document.getElementById('studioGenerateBtn');
-      const outBox = document.getElementById('studioOutputBox');
-      const outText = document.getElementById('studioOutputText');
-
-      if (!prompt) return alert('Please enter a topic prompt first.');
-
-      btn.disabled = true;
-      btn.textContent = 'Generating...';
-
-      const fullPrompt = `Act as an expert creative content strategist. Generate a structured ${type} for the topic: "${prompt}".`;
-      const result = await queryAI(fullPrompt);
-
-      outText.textContent = result;
-      outBox.classList.remove('hidden');
-
-      btn.disabled = false;
-      btn.textContent = 'Generate Content';
-    }
-
-    function copyStudioOutput() {
-      const text = document.getElementById('studioOutputText').textContent;
-      if (!text) return;
-      
-      const el = document.createElement('textarea');
-      el.value = text;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      alert('Content copied to clipboard!');
-    }
-
-    /* ==========================================================================
-       FOCUS TIMER LOGIC
-       ========================================================================== */
-    let timerInterval = null;
-    let timerSeconds = 25 * 60;
-    let isTimerRunning = false;
-
-    function toggleFocusTimer() {
-      const btn = document.getElementById('timerToggleBtn');
-      if (isTimerRunning) {
-        clearInterval(timerInterval);
-        isTimerRunning = false;
-        btn.textContent = 'Start Focus';
-      } else {
-        isTimerRunning = true;
-        btn.textContent = 'Pause Focus';
-        timerInterval = setInterval(() => {
-          if (timerSeconds > 0) {
-            timerSeconds--;
-            updateTimerDisplay();
-          } else {
-            clearInterval(timerInterval);
-            isTimerRunning = false;
-            btn.textContent = 'Start Focus';
-            state.focusMinutes += 25;
-            addExp(50);
-            saveState();
-            VoiceService.speak("Focus session completed! You earned 50 EXP.");
-          }
-        }, 1000);
-      }
-    }
-
-    function resetFocusTimer() {
-      clearInterval(timerInterval);
-      isTimerRunning = false;
-      timerSeconds = 25 * 60;
-      document.getElementById('timerToggleBtn').textContent = 'Start Focus';
-      updateTimerDisplay();
-    }
-
-    function updateTimerDisplay() {
-      const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
-      const s = (timerSeconds % 60).toString().padStart(2, '0');
-      document.getElementById('timerDisplay').textContent = `${m}:${s}`;
-    }
-
-    /* ==========================================================================
-       MODAL CONTROLLERS & SETTINGS
-       ========================================================================== */
+    function openMemoryModal() { document.getElementById('memoryModal').classList.remove('hidden'); }
+    function closeMemoryModal() { document.getElementById('memoryModal').classList.add('hidden'); }
     function openSettingsModal() {
       document.getElementById('apiProviderSelect').value = state.apiProvider;
       document.getElementById('groqKeyInput').value = state.keys.groq || '';
@@ -1107,97 +1156,336 @@
       document.getElementById('geminiKeyInput').value = state.keys.gemini || '';
       document.getElementById('settingsModal').classList.remove('hidden');
     }
-
-    function closeSettingsModal() {
-      document.getElementById('settingsModal').classList.add('hidden');
-    }
-
+    function closeSettingsModal() { document.getElementById('settingsModal').classList.add('hidden'); }
     function saveSettings() {
       state.apiProvider = document.getElementById('apiProviderSelect').value;
       state.keys.groq = document.getElementById('groqKeyInput').value.trim();
       state.keys.openrouter = document.getElementById('openrouterKeyInput').value.trim();
       state.keys.gemini = document.getElementById('geminiKeyInput').value.trim();
-
-      const voiceSel = document.getElementById('voiceSelect');
-      state.selectedVoiceUri = voiceSel ? voiceSel.value : '';
-
       saveState();
-      updateDashboardUI();
       closeSettingsModal();
     }
-
     function onProviderChange() {
-      const prov = document.getElementById('apiProviderSelect').value;
-      document.getElementById('apiStatusText').textContent = prov.toUpperCase() + ' API';
+      document.getElementById('apiStatusText').textContent = document.getElementById('apiProviderSelect').value.toUpperCase() + ' API';
+    }
+    function openGlossaryModal() { document.getElementById('glossaryModal').classList.remove('hidden'); }
+    function closeGlossaryModal() { document.getElementById('glossaryModal').classList.add('hidden'); }
+    function openNoteModal() { document.getElementById('noteModal').classList.remove('hidden'); }
+    function closeNoteModal() { document.getElementById('noteModal').classList.add('hidden'); }
+
+    async function handleSendMessage(msg) {
+      const input = document.getElementById('chatInput');
+      const text = msg || input.value.trim();
+      if (!text) return;
+      input.value = '';
+      appendChat('user', text);
+      const res = await ActionEngine.tryExecute(text);
+      if (res.handled) {
+        appendChat('assistant', res.reply);
+        VoiceService.speak(res.reply);
+      } else {
+        const ai = await queryAI(text);
+        appendChat('assistant', ai);
+        VoiceService.speak(ai);
+      }
     }
 
-    function openNoteModal() {
-      document.getElementById('noteModal').classList.remove('hidden');
-    }
-    function closeNoteModal() {
-      document.getElementById('noteModal').classList.add('hidden');
+    function appendChat(role, text) {
+      const stream = document.getElementById('chatStream');
+      const div = document.createElement('div');
+      div.className = 'flex items-start gap-3 ' + (role === 'user' ? 'flex-row-reverse' : '');
+      div.innerHTML = `<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 ${role === 'user' ? 'bg-purple-600 text-white' : 'bg-cyber-blue/20 text-cyber-blue'}">${role === 'user' ? 'U' : 'F'}</div><div class="rounded-2xl p-3.5 max-w-[85%] text-xs leading-relaxed border ${role === 'user' ? 'bg-purple-900/40 text-purple-100 border-purple-500/30' : 'bg-gray-800 text-gray-200 border-white/5'}">${escapeHTML(text)}</div>`;
+      stream.appendChild(div);
+      stream.scrollTop = stream.scrollHeight;
     }
 
-    function updateDashboardUI() {
-      document.getElementById('apiStatusText').textContent = state.apiProvider.toUpperCase() + ' API';
-      document.getElementById('dashFocusMins').textContent = `${state.focusMinutes}m`;
-      renderRPGStats();
-      renderNotes();
+    function toggleVoiceInput() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return alert('Speech recognition not supported.');
+      const rec = new SpeechRecognition();
+      rec.onresult = (e) => { handleSendMessage(e.results[0][0].transcript); };
+      rec.start();
+    }
+
+    function refreshAllViews() {
+      const stats = HabitManager.getTodayStats();
+      const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      setTxt('dashDailyProgress', `${stats.pct}%`);
+      setTxt('dashScriptsCount', String(state.studioScripts.length));
+      setTxt('dashCollectionsSub', `${state.studioCollections.length} Collections`);
+      setTxt('dashNotesCount', String(state.notes.length));
+      setTxt('oraOverallScore', `${stats.pct}%`);
+      setTxt('oraHabitRate', `${stats.pct}%`);
+      setTxt('dashTodayDate', new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }));
+      if (typeof StudioEngine !== 'undefined') StudioEngine.renderLibrary();
     }
 
     /* ==========================================================================
-       INITIALIZATION
+       CREATOR STUDIO 2.0 (PROFESSIONAL AI SCRIPT ENGINE & EXPORT)
        ========================================================================== */
-    window.addEventListener('load', () => {
-      loadState();
-      VoiceService.init();
-      renderQuests();
-      renderNotes();
-      updateDashboardUI();
+    const StudioEngine = {
+      activeSubTab: 'generator',
+      currentScript: {
+        id: null,
+        title: 'Untitled Script',
+        category: 'Love & Heartbreak',
+        content: '# Write or generate your script here...',
+        duration: '20-30s',
+        language: 'Hinglish',
+        collection: 'General',
+        tags: [],
+        createdAt: Date.now()
+      },
 
-      // Form Listeners
-      document.getElementById('chatForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        handleSendMessage();
-      });
-
-      document.getElementById('questForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const title = document.getElementById('questTitle').value.trim();
-        const exp = parseInt(document.getElementById('questExp').value);
-        if (!title) return;
-
-        state.rpg.quests.push({ id: Date.now(), title, exp, done: false });
-        saveState();
-        renderQuests();
-        document.getElementById('questTitle').value = '';
-      });
-
-      document.getElementById('noteForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const title = document.getElementById('noteTitle').value.trim();
-        const content = document.getElementById('noteContent').value.trim();
-        if (!title || !content) return;
-
-        state.notes.push({ title, content, date: new Date().toLocaleDateString() });
-        saveState();
-        renderNotes();
-        closeNoteModal();
-        document.getElementById('noteTitle').value = '';
-        document.getElementById('noteContent').value = '';
-      });
-
-      document.getElementById('activityForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const mins = parseInt(document.getElementById('actMins').value) || 0;
-        if (mins > 0) {
-          state.focusMinutes += mins;
-          saveState();
-          updateDashboardUI();
-          document.getElementById('actName').value = '';
-          document.getElementById('actMins').value = '';
-          alert(`Logged ${mins} focus minutes!`);
+      init() {
+        if (!state.studioCollections.length) {
+          state.studioCollections = [
+            { id: 'col_1', name: 'Relationship Psychology', description: 'Deep insights into emotional dynamics', category: 'Relationship Psychology', scriptIds: [] },
+            { id: 'col_2', name: 'Heartbreak & Moving On', description: 'Raw truths and healing scripts', category: 'Love & Heartbreak', scriptIds: [] },
+            { id: 'col_3', name: 'Self-Improvement & Discipline', description: 'Personal growth and habits', category: 'Self-Improvement', scriptIds: [] }
+          ];
         }
+        this.renderLibrary();
+        this.renderCollections();
+      },
+
+      switchSubTab(sub) {
+        this.activeSubTab = sub;
+        ['generator', 'bulk', 'library', 'collections'].forEach(id => {
+          document.getElementById(`studio-panel-${id}`)?.classList.toggle('hidden', id !== sub);
+        });
+        if (sub === 'library') this.renderLibrary();
+        if (sub === 'collections') this.renderCollections();
+      },
+
+      async generateScript(params = {}) {
+        const cat = params.category || document.getElementById('stuCategory')?.value || 'Love & Heartbreak';
+        const topic = params.topic || document.getElementById('stuTopicInput')?.value?.trim() || 'Emotional truth';
+        const lang = params.language || document.getElementById('stuLang')?.value || 'Hinglish';
+        const duration = params.duration || document.getElementById('stuDuration')?.value || '20-30s';
+        const tone = params.tone || document.getElementById('stuTone')?.value || 'Raw & Honest';
+
+        const btn = document.getElementById('stuGenerateBtn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; }
+
+        const prompt = `Act as expert creator @nikl.writes and Nikhil Winter. Create a viral short video script (${duration}) about: "${topic}". Category: ${cat}. Language: ${lang} (natural conversational Hinglish). Tone: ${tone}. Return a JSON object with keys: "title", "content", "tags" (array of 3).`;
+
+        try {
+          const raw = await queryAI(prompt);
+          let title = topic.slice(0, 35);
+          let content = raw;
+          let tags = [cat.toLowerCase(), 'shorts', 'mindset'];
+
+          const jMatch = raw.match(/\{[\s\S]*\}/);
+          if (jMatch) {
+            try {
+              const parsed = JSON.parse(jMatch[0]);
+              if (parsed.title) title = parsed.title;
+              if (parsed.content) content = parsed.content;
+              if (Array.isArray(parsed.tags)) tags = parsed.tags;
+            } catch (_) {}
+          }
+
+          this.currentScript = {
+            id: 'scr_' + Date.now(),
+            title,
+            category: cat,
+            content,
+            duration,
+            language: lang,
+            collection: 'General',
+            tags,
+            createdAt: Date.now()
+          };
+
+          document.getElementById('stuActiveCategoryBadge').textContent = cat;
+          document.getElementById('stuActiveTitleDisplay').textContent = title;
+          document.getElementById('stuScriptContentEditor').value = content;
+        } catch (e) {
+          alert('Generation error: ' + e.message);
+        } finally {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>Generate Script'; }
+        }
+      },
+
+      async generateBulkBatch({ count = 10, topic, category }) {
+        const resBox = document.getElementById('bulkResultsContainer');
+        if (resBox) resBox.innerHTML = `<p class="text-xs text-purple-300">Generating ${count} scripts...</p>`;
+
+        let success = 0;
+        for (let i = 1; i <= count; i++) {
+          try {
+            await this.generateScript({ topic: `${topic || 'Growth'} - Part ${i}`, category: category || 'Love & Heartbreak' });
+            this.saveCurrentScript(false);
+            success++;
+          } catch (_) {}
+        }
+        if (resBox) resBox.innerHTML = `<p class="text-xs font-bold text-emerald-400">Successfully generated and saved ${success} scripts!</p>`;
+        this.renderLibrary();
+      },
+
+      async runToolAction(type) {
+        const text = document.getElementById('stuScriptContentEditor')?.value?.trim();
+        const outBox = document.getElementById('stuToolOutputBox');
+        if (!text || !outBox) return alert('Enter or generate script content first.');
+        outBox.classList.remove('hidden');
+        outBox.textContent = `Running AI ${type}...`;
+        const res = await queryAI(`For this script:\n${text}\n\nTask: ${type === 'hook' ? 'Generate 3 alternative strong hooks.' : (type === 'improve' ? 'Improve grammar and emotional impact.' : 'Generate Instagram caption and hashtags.')}`);
+        outBox.textContent = res;
+      },
+
+      saveCurrentScript(showAlert = true) {
+        const content = document.getElementById('stuScriptContentEditor')?.value?.trim();
+        if (!content) return;
+        this.currentScript.content = content;
+        if (!this.currentScript.id) this.currentScript.id = 'scr_' + Date.now();
+        
+        const idx = state.studioScripts.findIndex(s => s.id === this.currentScript.id);
+        if (idx !== -1) state.studioScripts[idx] = { ...this.currentScript };
+        else state.studioScripts.unshift({ ...this.currentScript });
+        saveState();
+        if (showAlert) alert(`Saved "${this.currentScript.title}" to library.`);
+      },
+
+      previewVoice() {
+        const text = document.getElementById('stuScriptContentEditor')?.value?.trim();
+        if (text) VoiceService.speak(text);
+      },
+
+      exportActiveScript() {
+        const text = document.getElementById('stuScriptContentEditor')?.value?.trim();
+        const title = document.getElementById('stuActiveTitleDisplay')?.textContent || 'script';
+        const fmt = document.getElementById('stuExportFormat')?.value || 'txt';
+        if (!text) return alert('No script to export.');
+
+        if (fmt === 'txt') {
+          const blob = new Blob([`${title}\n\n${text}`], { type: 'text/plain;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${title.toLowerCase().replace(/[^a-z0-9]/g, '_')}.txt`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } else if (fmt === 'pdf') {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+          doc.setFont('Helvetica', 'bold');
+          doc.setFontSize(16);
+          doc.text(title, 20, 20);
+          doc.setFont('Helvetica', 'normal');
+          doc.setFontSize(11);
+          const splitText = doc.splitTextToSize(text, 170);
+          doc.text(splitText, 20, 30);
+          doc.save(`${title.toLowerCase().replace(/[^a-z0-9]/g, '_')}.pdf`);
+        } else {
+          // DOCX fallback or TXT equivalent formatted
+          const blob = new Blob([`<html><body><h1>${escapeHTML(title)}</h1><p>${escapeHTML(text).replace(/\n/g, '<br>')}</p></body></html>`], { type: 'application/msword' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${title.toLowerCase().replace(/[^a-z0-9]/g, '_')}.doc`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      },
+
+      exportAllAsPDF() {
+        if (!state.studioScripts.length) return alert('No saved scripts.');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        state.studioScripts.forEach((s, idx) => {
+          if (idx > 0) doc.addPage();
+          doc.setFont('Helvetica', 'bold');
+          doc.setFontSize(16);
+          doc.text(s.title, 20, 20);
+          doc.setFont('Helvetica', 'normal');
+          doc.setFontSize(11);
+          const splitText = doc.splitTextToSize(s.content, 170);
+          doc.text(splitText, 20, 30);
+        });
+        doc.save(`nexus_script_library_${DateUtils.todayISO()}.pdf`);
+      },
+
+      renderLibrary() {
+        const listEl = document.getElementById('studioLibraryList');
+        const badge = document.getElementById('studioLibCountBadge');
+        if (badge) badge.textContent = state.studioScripts.length;
+        if (!listEl) return;
+
+        if (!state.studioScripts.length) {
+          listEl.innerHTML = '<p class="text-xs text-gray-500">No scripts saved in your library yet.</p>';
+          return;
+        }
+
+        listEl.innerHTML = state.studioScripts.map(s => `
+          <div class="p-3.5 rounded-xl glass-card flex items-center justify-between gap-3 border border-white/5 text-xs">
+            <div class="space-y-1 min-w-0 flex-1">
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-purple-500/15 text-purple-300">${escapeHTML(s.category)}</span>
+              <h4 class="font-bold text-white truncate">${escapeHTML(s.title)}</h4>
+              <p class="text-gray-400 truncate">${escapeHTML(s.content)}</p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button type="button" onclick="StudioEngine.loadScriptToEditor('${s.id}')" class="px-2.5 py-1 rounded bg-purple-600/30 text-purple-200 text-[11px] font-semibold">Open</button>
+              <button type="button" onclick="StudioEngine.deleteScript('${s.id}')" class="text-gray-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        `).join('');
+      },
+
+      loadScriptToEditor(id) {
+        const s = state.studioScripts.find(x => x.id === id);
+        if (!s) return;
+        this.currentScript = { ...s };
+        document.getElementById('stuActiveCategoryBadge').textContent = s.category;
+        document.getElementById('stuActiveTitleDisplay').textContent = s.title;
+        document.getElementById('stuScriptContentEditor').value = s.content;
+        this.switchSubTab('generator');
+      },
+
+      deleteScript(id) {
+        if (!confirm('Delete this script permanently?')) return;
+        state.studioScripts = state.studioScripts.filter(s => s.id !== id);
+        saveState();
+        this.renderLibrary();
+      },
+
+      renderCollections() {
+        const grid = document.getElementById('studioCollectionsGrid');
+        if (!grid) return;
+        grid.innerHTML = state.studioCollections.map(c => `
+          <div class="glass-card p-4 rounded-xl space-y-2 border border-white/10 text-xs">
+            <span class="text-[10px] font-bold text-cyber-blue uppercase">${escapeHTML(c.category)}</span>
+            <h4 class="font-bold text-white text-sm">${escapeHTML(c.name)}</h4>
+            <p class="text-gray-400">${escapeHTML(c.description)}</p>
+          </div>
+        `).join('');
+      },
+
+      promptNewModalCollection() {
+        const name = prompt('Enter collection name:');
+        if (!name) return;
+        state.studioCollections.push({ id: 'col_' + Date.now(), name, description: 'Custom series', category: 'Relationship Psychology', scriptIds: [] });
+        saveState();
+        this.renderCollections();
+      }
+    };
+
+    /* ==========================================================================
+       EVENT BINDINGS & BOOT
+       ========================================================================== */
+    window.addEventListener('load', async () => {
+      loadState();
+      await NexusDB.init();
+      StudioEngine.init();
+      refreshAllViews();
+
+      document.getElementById('chatForm')?.addEventListener('submit', (e) => { e.preventDefault(); handleSendMessage(); });
+      document.getElementById('studioGenForm')?.addEventListener('submit', async (e) => { e.preventDefault(); await StudioEngine.generateScript({}); });
+      document.getElementById('studioBulkForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const top = document.getElementById('bulkTopicInput').value.trim();
+        const cnt = parseInt(document.getElementById('bulkCount').value, 10) || 10;
+        await StudioEngine.generateBulkBatch({ count: cnt, topic: top });
       });
     });
   </script>
